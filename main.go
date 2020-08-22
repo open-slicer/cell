@@ -14,8 +14,6 @@ import (
 	"os"
 )
 
-// This is somewhat messy at the moment.
-
 var dbConn *pgx.Conn
 
 func main() {
@@ -30,7 +28,15 @@ func main() {
 	}
 
 	databaseUrl := viper.GetString("database.url")
-	doMigrations(databaseUrl)
+	mgr, err := migrate.New(viper.GetString("database.migrations.source"), databaseUrl)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Couldn't create migration instance")
+	}
+
+	err = mgr.Up()
+	if err != nil {
+		log.Warn().Err(err).Msg("Couldn't run migrations")
+	}
 
 	dbConn, err = pgx.Connect(context.Background(), databaseUrl)
 	if err != nil {
@@ -51,16 +57,4 @@ func main() {
 		log.Err(r.RunTLS(addr, certFile, keyFile)).Msg("Running HTTP server (tls)")
 	}
 	log.Err(r.Run(addr)).Msg("Running HTTP server")
-}
-
-func doMigrations(databaseUrl string) {
-	mgr, err := migrate.New(viper.GetString("database.migrations.source"), databaseUrl)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Couldn't create migration instance")
-	}
-
-	err = mgr.Up()
-	if err != nil {
-		log.Warn().Err(err).Msg("Couldn't run migrations")
-	}
 }
