@@ -1,3 +1,3 @@
 # Cell
 
-SlicerCell — the reference implementation of the Slicer server.
+This repository hosts SlicerCell, the reference implementation of the Slicer server.
