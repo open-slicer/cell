@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -11,7 +13,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var dbConn *pgx.Conn
@@ -27,8 +28,8 @@ func main() {
 		log.Fatal().Err(err).Msg("Couldn't read config")
 	}
 
-	databaseUrl := viper.GetString("database.url")
-	mgr, err := migrate.New(viper.GetString("database.migrations.source"), databaseUrl)
+	databaseURL := viper.GetString("database.url")
+	mgr, err := migrate.New(viper.GetString("database.migrations.source"), databaseURL)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Couldn't create migration instance")
 	}
@@ -38,7 +39,7 @@ func main() {
 		log.Warn().Err(err).Msg("Couldn't run migrations")
 	}
 
-	dbConn, err = pgx.Connect(context.Background(), databaseUrl)
+	dbConn, err = pgx.Connect(context.Background(), databaseURL)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Opening database")
 	}
