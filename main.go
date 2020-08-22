@@ -1,18 +1,35 @@
 package main
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/gitlab"
+	"github.com/jackc/pgx/v4"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
+
+// This is somewhat messy at the moment.
+
+var dbConn *pgx.Conn
 
 func main() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(".")
-	if err := viper.ReadInConfig(); err != nil {
+	err := viper.ReadInConfig()
+	if err != nil {
 		log.Fatal().Err(err).Msg("Couldn't read config")
 	}
+
+	databaseUrl := viper.GetString("database.url")
+	doMigrations(databaseUrl)
+
+	dbConn, err = pgx.Connect(context.Background(), databaseUrl)
+	log.Fatal().Err(err).Msg("Opening database")
+	defer log.Err(dbConn.Close(context.Background())).Msg("Closing database")
 
 	r := gin.Default()
 	// Gin defaults to debug mode.
@@ -27,4 +44,10 @@ func main() {
 		log.Err(r.RunTLS(addr, certFile, keyFile)).Msg("Running HTTP server (tls)")
 	}
 	log.Err(r.Run(addr)).Msg("Running HTTP server")
+}
+
+func doMigrations(databaseUrl string) {
+	mgr, err := migrate.New(viper.GetString("database.migrations.source"), databaseUrl)
+	log.Fatal().Err(err).Msg("Couldn't create migration instance")
+	log.Fatal().Err(mgr.Steps(viper.GetInt("database.migrations.steps"))).Msg("Couldn't run migrations")
 }
