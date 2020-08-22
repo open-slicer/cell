@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/golang-migrate/migrate/v4/source/gitlab"
 	"github.com/jackc/pgx/v4"
 	"github.com/rs/zerolog"
@@ -32,7 +33,9 @@ func main() {
 	doMigrations(databaseUrl)
 
 	dbConn, err = pgx.Connect(context.Background(), databaseUrl)
-	log.Fatal().Err(err).Msg("Opening database")
+	if err != nil {
+		log.Fatal().Err(err).Msg("Opening database")
+	}
 	defer log.Err(dbConn.Close(context.Background())).Msg("Closing database")
 
 	r := gin.Default()
@@ -52,6 +55,12 @@ func main() {
 
 func doMigrations(databaseUrl string) {
 	mgr, err := migrate.New(viper.GetString("database.migrations.source"), databaseUrl)
-	log.Fatal().Err(err).Msg("Couldn't create migration instance")
-	log.Fatal().Err(mgr.Steps(viper.GetInt("database.migrations.steps"))).Msg("Couldn't run migrations")
+	if err != nil {
+		log.Fatal().Err(err).Msg("Couldn't create migration instance")
+	}
+
+	err = mgr.Up()
+	if err != nil {
+		log.Warn().Err(err).Msg("Couldn't run migrations")
+	}
 }
