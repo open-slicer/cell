@@ -4,7 +4,10 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
+
+const dayDuration = time.Hour * 24
 
 type statusCode int
 
