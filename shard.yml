@@ -1,0 +1,13 @@
+name: cell
+version: 0.1.0
+
+authors:
+  - Alex P. <alexeek@protonmail.com>
+
+targets:
+  cell:
+    main: src/cell.cr
+
+crystal: 0.35.1
+
+license: Apache-2.0
