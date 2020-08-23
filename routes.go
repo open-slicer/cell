@@ -1,6 +1,6 @@
 package main
 
-func init() {
+func setupRoutes() {
 	authMiddleware, _ := getAuthMiddleware()
 
 	v2 := r.Group("/api/v2")
