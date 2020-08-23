@@ -1,6 +1,6 @@
-# cell
+# Cell
 
-FIXME
+This repository hosts SlicerCell, the reference implementation of the Slicer server.
 
 ## Prerequisites
 
@@ -16,4 +16,6 @@ To start a web server for the application, run:
 
 ## License
 
-Copyright © 2020 FIXME
+Licensed under version 2.0 of the Apache License. See the `LICENSE` file.
+
+Copyright © 2020 Alex P.
