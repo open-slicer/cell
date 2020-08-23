@@ -11,6 +11,8 @@ import (
 
 const callTimeout = 4 * time.Second
 
+var db *database
+
 type database struct {
 	uri string
 	// c will be nil if database.connect returns a non-nil value.
@@ -30,5 +32,3 @@ func (d *database) connect() error {
 	ctx, _ = context.WithTimeout(context.Background(), callTimeout)
 	return d.c.Ping(ctx, readpref.Primary())
 }
-
-var db *database
