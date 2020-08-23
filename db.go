@@ -15,8 +15,10 @@ var db *database
 
 type database struct {
 	uri string
-	// c can be nil. Assuming that database.connect returned nil, this should be non-nil.
-	c *mongo.Client
+
+	c            *mongo.Client
+	mainDatabase *mongo.Database
+	users        *mongo.Collection
 }
 
 func (d *database) connect() error {
@@ -30,5 +32,12 @@ func (d *database) connect() error {
 	}
 
 	ctx, _ = context.WithTimeout(context.Background(), callTimeout)
-	return d.c.Ping(ctx, readpref.Primary())
+	err = d.c.Ping(ctx, readpref.Primary())
+	if err != nil {
+		return err
+	}
+
+	d.mainDatabase = d.c.Database("cell")
+	d.users = d.mainDatabase.Collection("users")
+	return nil
 }
