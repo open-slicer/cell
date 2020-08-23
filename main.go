@@ -1,24 +1,21 @@
 package main
 
 import (
-	"context"
-	"os"
-
 	"github.com/gin-gonic/gin"
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/golang-migrate/migrate/v4/source/gitlab"
-	"github.com/jackc/pgx/v4"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
+	"os"
 )
-
-var dbConn *pgx.Conn
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+	environment := viper.GetString("environment")
+	if environment != "release" {
+		log.Logger = log.Level(zerolog.TraceLevel)
+		log.Debug().Msg("Environment isn't 'release'; using trace level")
+	}
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
@@ -28,28 +25,15 @@ func main() {
 		log.Fatal().Err(err).Msg("Couldn't read config")
 	}
 
-	databaseURL := viper.GetString("database.url")
-	mgr, err := migrate.New(viper.GetString("database.migrations.source"), databaseURL)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Couldn't create migration instance")
+	db = &database{
+		uri: viper.GetString("database.uri"),
 	}
-
-	err = mgr.Up()
-	if err != nil {
-		log.Warn().Err(err).Msg("Couldn't run migrations")
+	if err := db.connect(); err != nil {
+		log.Fatal().Err(err).Str("uri", db.uri).Msg("Connecting to MongoDB")
 	}
-
-	dbConn, err = pgx.Connect(context.Background(), databaseURL)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Opening database")
-	}
-	defer log.Err(dbConn.Close(context.Background())).Msg("Closing database")
 
 	r := gin.Default()
-	// Gin defaults to debug mode.
-	if !viper.GetBool("debug") {
-		gin.SetMode(gin.ReleaseMode)
-	}
+	gin.SetMode(environment)
 
 	addr := viper.GetString("http.address")
 	if certFile := viper.GetString("security.cert_file"); certFile != "" {
