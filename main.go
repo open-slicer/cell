@@ -38,9 +38,19 @@ func main() {
 
 	addr := viper.GetString("http.address")
 	if certFile := viper.GetString("security.cert_file"); certFile != "" {
+		log.Debug().Bool("tls", true).Str("addr", addr).Msg("Running HTTP server")
+
 		// Let's assume key_file is present.
 		keyFile := viper.GetString("security.key_file")
-		log.Err(r.RunTLS(addr, certFile, keyFile)).Msg("Running HTTP server (tls)")
+		err = r.RunTLS(addr, certFile, keyFile)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Running HTTP server (tls)")
+		}
 	}
-	log.Err(r.Run(addr)).Msg("Running HTTP server")
+
+	log.Debug().Bool("tls", false).Str("addr", addr).Msg("Running HTTP server")
+	err = r.Run(addr)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Running HTTP server")
+	}
 }
