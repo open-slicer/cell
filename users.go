@@ -6,11 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nbutton23/zxcvbn-go"
 	"github.com/rs/xid"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"regexp"
+	"strings"
 )
+
+var usernameRegex = regexp.MustCompile(fmt.Sprintf(
+	"^(?=.{%d,32}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
+	viper.GetInt("options.min_username_length"),
+))
 
 type user struct {
 	ID           []byte `json:"id" bson:"_id"`
@@ -38,6 +46,15 @@ func (u *user) insert() response {
 			HTTP:    http.StatusBadRequest,
 		}
 	}
+	if !usernameRegex.MatchString(u.Username) {
+		return response{
+			Code:    errorDidntMatch,
+			Message: "Username didn't match the required regex",
+			HTTP:    http.StatusBadRequest,
+			Data:    usernameRegex.String(),
+		}
+	}
+
 	passStrength := zxcvbn.PasswordStrength(u.Password, []string{u.Username, u.DisplayName})
 	if passStrength.Score < 3 {
 		return response{
@@ -83,6 +100,8 @@ func (u *user) insert() response {
 	u.ID = xid.New().Bytes()
 	if u.DisplayName == "" {
 		u.DisplayName = u.Username
+	} else {
+		u.DisplayName = strings.TrimSpace(u.DisplayName)
 	}
 
 	if _, err := db.users.InsertOne(ctx, u); err != nil {
