@@ -81,6 +81,9 @@ func (u *user) insert() response {
 	}
 
 	u.ID = xid.New().Bytes()
+	if u.DisplayName == "" {
+		u.DisplayName = u.Username
+	}
 
 	if _, err := db.users.InsertOne(ctx, u); err != nil {
 		return response{
