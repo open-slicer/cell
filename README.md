@@ -1,6 +1,6 @@
 # Cell
 
-This repository hosts SlicerCell, the reference implementation of the Slicer server. It's written in [Crystal](https://crystal-lang.org), a new Ruby-like language compiled for the LLVM.
+This repository hosts SlicerCell, the reference implementation of the Slicer server.
 
 ## License
 
