@@ -17,7 +17,7 @@ func main() {
 	environment := viper.GetString("environment")
 	if environment != "release" {
 		log.Logger = log.Level(zerolog.TraceLevel)
-		log.Debug().Msg("Environment isn't 'release'; using trace level")
+		log.Info().Msg("Environment isn't 'release'; using trace level")
 	}
 
 	viper.SetConfigName("config")
