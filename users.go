@@ -17,7 +17,7 @@ type user struct {
 	Username     string `json:"username" bson:"username"`
 	DisplayName  string `json:"display_name" bson:"display_name"`
 	PublicKey    []byte `json:"public_key" bson:"public_key"`
-	Password     string `json:"-" bson:"-"`
+	Password     string `json:"password,omitempty" bson:"-"`
 	PasswordHash []byte `json:"-" bson:"password_hash"`
 }
 
@@ -80,7 +80,6 @@ func (u *user) insert() response {
 		}
 	}
 
-	// Let's make sure to give the user a unique ID.
 	u.ID = xid.New().Bytes()
 
 	if _, err := db.users.InsertOne(ctx, u); err != nil {
@@ -90,6 +89,8 @@ func (u *user) insert() response {
 			HTTP:    http.StatusInternalServerError,
 		}
 	}
+	// Make sure to hide the password.
+	u.Password = ""
 	return response{
 		Code:    http.StatusOK,
 		Message: "User created",
