@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/nbutton23/zxcvbn-go"
 	"github.com/rs/xid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,6 +22,15 @@ type user struct {
 }
 
 func (u *user) insert() response {
+	if someZero(u.Username, u.Password) {
+		return response{
+			Code:    errorMissingField,
+			Message: "`username` and `password` are required",
+			HTTP:    http.StatusBadRequest,
+			Data:    []string{"username", "password"},
+		}
+	}
+
 	if len(u.Password) > 72 {
 		return response{
 			Code:    errorTooLarge,
@@ -85,4 +95,17 @@ func (u *user) insert() response {
 		Message: "User created",
 		Data:    u,
 	}
+}
+
+func handleUsersPost(c *gin.Context) {
+	user := user{}
+	if err := c.BindJSON(&user); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response{
+			Code:    errorBindFailed,
+			Message: "Failed to bind JSON",
+		})
+		return
+	}
+
+	user.insert().send(c)
 }
