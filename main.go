@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+var r = gin.Default()
+
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
@@ -32,7 +34,6 @@ func main() {
 		log.Fatal().Err(err).Str("uri", db.uri).Msg("Connecting to MongoDB")
 	}
 
-	r := gin.Default()
 	gin.SetMode(environment)
 
 	addr := viper.GetString("http.address")
