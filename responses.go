@@ -6,6 +6,7 @@ const (
 	errorInternalError statusCode = iota
 	errorExists
 	errorPasswordInsecure
+	errorTooLarge
 )
 
 // response is a generic HTTP response. If HTTP is zeroed, Code should be used.
