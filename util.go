@@ -20,6 +20,7 @@ const (
 	errorBindFailed
 	errorMissingField
 	errorDidntMatch
+	errorNotFound
 )
 
 type tooLargeData struct {
