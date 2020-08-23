@@ -3,6 +3,7 @@ module cell
 go 1.15
 
 require (
+	github.com/appleboy/gin-jwt v2.5.0+incompatible // indirect
 	github.com/getsentry/sentry-go v0.7.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/google/go-cmp v0.4.0 // indirect
@@ -12,4 +13,5 @@ require (
 	github.com/spf13/viper v1.7.1
 	go.mongodb.org/mongo-driver v1.4.0
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0 // indirect
 )
