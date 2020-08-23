@@ -137,6 +137,35 @@ func handleUsersPost(c *gin.Context) {
 	user.insert().send(c)
 }
 
+func (u *user) get() response {
+	ctx, _ := context.WithTimeout(context.Background(), callTimeout)
+	if err := db.users.FindOne(ctx, bson.M{
+		"_id": u.ID,
+	}).Decode(u); err != nil {
+		if err != mongo.ErrNoDocuments {
+			return internalError(err)
+		}
+		return response{
+			Code:    errorNotFound,
+			Message: "User doesn't exist",
+			HTTP:    http.StatusNotFound,
+		}
+	}
+
+	return response{
+		Code:    http.StatusOK,
+		Message: "User found",
+		Data:    u,
+	}
+}
+
+func handleUsersGet(c *gin.Context) {
+	user := user{
+		ID: []byte(c.Param("id")),
+	}
+	user.get().send(c)
+}
+
 const identityKey = "id"
 
 func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
