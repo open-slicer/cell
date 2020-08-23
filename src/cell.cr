@@ -1,6 +1,7 @@
-# TODO: Write documentation for `Cell`
-module Cell
-  VERSION = "0.1.0"
+require "kemal"
 
-  # TODO: Write code
+get "/" do
+  "todo"
 end
+
+Kemal.run

@@ -11,3 +11,9 @@ targets:
 crystal: 0.35.1
 
 license: Apache-2.0
+
+dependencies:
+  kemal:
+    github: kemalcr/kemal
+    # Kemal is yet to make a release that supports Crystal 0.35.
+    commit: a819d4792bbc63d993d6dd2b15f9af5efb0c2d8c
