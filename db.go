@@ -15,7 +15,7 @@ var db *database
 
 type database struct {
 	uri string
-	// c will be nil if database.connect returns a non-nil value.
+	// c can be nil. Assuming that database.connect returned nil, this should be non-nil.
 	c *mongo.Client
 }
 
