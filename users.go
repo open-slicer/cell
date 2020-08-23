@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nbutton23/zxcvbn-go"
 	"github.com/rs/xid"
-	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
@@ -15,10 +14,7 @@ import (
 	"strings"
 )
 
-var usernameRegex = regexp.MustCompile(fmt.Sprintf(
-	"^(?=.{%d,32}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
-	viper.GetInt("options.min_username_length"),
-))
+var usernameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
 
 type user struct {
 	ID           []byte `json:"id" bson:"_id"`
@@ -46,7 +42,7 @@ func (u *user) insert() response {
 			HTTP:    http.StatusBadRequest,
 		}
 	}
-	if len(u.DisplayName) > 32 {
+	if len(u.Username) > 32 || len(u.DisplayName) > 32 {
 		return response{
 			Code:    errorTooLarge,
 			Message: "Username must be less than 32 characters",
