@@ -3,8 +3,8 @@ module cell
 go 1.15
 
 require (
-	github.com/getsentry/sentry-go v0.7.0 // indirect
 	github.com/gin-gonic/gin v1.6.3
+	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d
 	github.com/rs/xid v1.2.1
 	github.com/rs/zerolog v1.19.0
