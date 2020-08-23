@@ -35,20 +35,32 @@ func (u *user) insert() response {
 		}
 	}
 
-	if len(u.Password) > 72 {
+	passwordLen := len(u.Password)
+	if passwordLen > 72 {
 		return response{
 			Code:    errorTooLarge,
 			Message: "Password must be less than 72 characters",
 			HTTP:    http.StatusBadRequest,
+			Data: tooLargeData{
+				Offending: []string{"password"},
+				Got:       passwordLen,
+				Want:      72,
+			},
 		}
 	}
 	if len(u.Username) > 32 || len(u.DisplayName) > 32 {
 		return response{
 			Code:    errorTooLarge,
-			Message: "Username must be less than 32 characters",
+			Message: "Username and display name must be less than 32 characters",
 			HTTP:    http.StatusBadRequest,
+			Data: tooLargeData{
+				Offending: []string{"username", "display_name"},
+				Got:       passwordLen,
+				Want:      32,
+			},
 		}
 	}
+
 	if !usernameRegex.MatchString(u.Username) {
 		return response{
 			Code:    errorDidntMatch,
