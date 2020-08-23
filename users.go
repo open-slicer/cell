@@ -15,7 +15,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 )
 
 var usernameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
@@ -146,7 +145,7 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		Realm:       "slicer",
 		Key:         []byte(viper.GetString("security.secret")),
 		IdentityKey: identityKey,
-		MaxRefresh:  time.Hour * 48,
+		MaxRefresh:  dayDuration * 7,
 		TokenLookup: "header: Authorization, query: token",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*user); ok {
