@@ -18,7 +18,7 @@ type response struct {
 	Code    statusCode  `json:"code"`
 	Message string      `json:"message"`
 	HTTP    int         `json:"-"`
-	Data    interface{} `json:"data"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 func (r response) send(c *gin.Context) {
