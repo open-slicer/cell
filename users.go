@@ -54,7 +54,7 @@ func (u *user) insert() response {
 		// TODO: Capture this error with Sentry.
 		return response{
 			Code:    errorInternalError,
-			Message: "An internal server error was encountered when checking for existing users",
+			Message: "Failed to find existing users",
 			HTTP:    http.StatusInternalServerError,
 		}
 	}
@@ -65,7 +65,7 @@ func (u *user) insert() response {
 		// TODO: Capture this error with Sentry.
 		return response{
 			Code:    errorInternalError,
-			Message: "Couldn't hash password",
+			Message: "Failed to hash password",
 			HTTP:    http.StatusInternalServerError,
 		}
 	}
@@ -76,7 +76,7 @@ func (u *user) insert() response {
 	if _, err := db.users.InsertOne(ctx, u); err != nil {
 		return response{
 			Code:    errorInternalError,
-			Message: "An internal server error was encountered when creating this user",
+			Message: "Failed to create user",
 			HTTP:    http.StatusInternalServerError,
 		}
 	}
