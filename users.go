@@ -19,7 +19,7 @@ import (
 var usernameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
 
 type user struct {
-	ID           []byte `json:"id" bson:"_id"`
+	ID           string `json:"id" bson:"_id"`
 	Username     string `json:"username" bson:"username"`
 	DisplayName  string `json:"display_name" bson:"display_name"`
 	PublicKey    []byte `json:"public_key" bson:"public_key"`
@@ -104,7 +104,7 @@ func (u *user) insert() response {
 		return internalError(err)
 	}
 
-	u.ID = xid.New().Bytes()
+	u.ID = xid.New().String()
 	if u.DisplayName == "" {
 		u.DisplayName = u.Username
 	} else {
@@ -161,7 +161,7 @@ func (u *user) get() response {
 
 func handleUsersGet(c *gin.Context) {
 	user := user{
-		ID: []byte(c.Param("id")),
+		ID: c.Param("id"),
 	}
 	user.get().send(c)
 }
@@ -176,7 +176,7 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		MaxRefresh:  dayDuration * 7,
 		TokenLookup: "header: Authorization, query: token",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*user); ok {
+			if v, ok := data.(user); ok {
 				return jwt.MapClaims{
 					identityKey: v.ID,
 				}
@@ -185,8 +185,8 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-			return &user{
-				ID: claims[identityKey].([]byte),
+			return user{
+				ID: claims[identityKey].(string),
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
