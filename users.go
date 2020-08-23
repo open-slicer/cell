@@ -81,23 +81,13 @@ func (u *user) insert() response {
 			Data:    fetchedUser,
 		}
 	} else if err != mongo.ErrNoDocuments {
-		// TODO: Capture this error with Sentry.
-		return response{
-			Code:    errorInternalError,
-			Message: "Failed to find existing users",
-			HTTP:    http.StatusInternalServerError,
-		}
+		return internalError(err)
 	}
 
 	var err error
 	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
-		// TODO: Capture this error with Sentry.
-		return response{
-			Code:    errorInternalError,
-			Message: "Failed to hash password",
-			HTTP:    http.StatusInternalServerError,
-		}
+		return internalError(err)
 	}
 
 	u.ID = xid.New().Bytes()
@@ -108,11 +98,7 @@ func (u *user) insert() response {
 	}
 
 	if _, err := db.users.InsertOne(ctx, u); err != nil {
-		return response{
-			Code:    errorInternalError,
-			Message: "Failed to create user",
-			HTTP:    http.StatusInternalServerError,
-		}
+		return internalError(err)
 	}
 	// Make sure to hide the password.
 	u.Password = ""
