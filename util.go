@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/getsentry/sentry-go"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 type statusCode int
 
@@ -65,4 +69,21 @@ func someZero(vals ...interface{}) bool {
 		}
 	}
 	return false
+}
+
+type internalErrorData struct {
+	EventID string `json:"event_id"`
+}
+
+func internalError(err error) response {
+	eventID := string(*sentry.CaptureException(err))
+
+	return response{
+		Code:    errorInternalError,
+		Message: "An internal server error was encountered and it was recorded",
+		HTTP:    http.StatusInternalServerError,
+		Data: internalErrorData{
+			EventID: eventID,
+		},
+	}
 }
