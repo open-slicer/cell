@@ -1,11 +1,20 @@
 package main
 
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
 func setupRoutes() {
-	authMiddleware, _ := getAuthMiddleware()
-	authBlock := authMiddleware.MiddlewareFunc()
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "https://owo.gg/slicer/cell/-/wikis")
+	})
 
 	v2 := r.Group("/api/v2")
 	{
+		authMiddleware, _ := getAuthMiddleware()
+		authBlock := authMiddleware.MiddlewareFunc()
+
 		v2.POST("/users", handleUsersPost)
 		v2.GET("/users/:id", authBlock, handleUsersGet)
 
