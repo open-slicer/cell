@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -25,6 +26,12 @@ func main() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Couldn't read config")
+	}
+
+	if dsn := viper.GetString("sentry.dsn"); dsn != "" {
+		log.Err(sentry.Init(sentry.ClientOptions{
+			Dsn: dsn,
+		})).Msg("Initialising Sentry")
 	}
 
 	db = &database{
