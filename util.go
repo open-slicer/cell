@@ -18,6 +18,12 @@ const (
 	errorDidntMatch
 )
 
+type tooLargeData struct {
+	Offending []string `json:"offending"`
+	Got       int      `json:"got"`
+	Want      int      `json:"want"`
+}
+
 // response is a generic HTTP response. If HTTP is zeroed, Code should be used.
 type response struct {
 	Code    statusCode  `json:"code"`
