@@ -28,12 +28,12 @@ type user struct {
 }
 
 func (u *user) insert() response {
-	if someZero(u.Username, u.Password) {
+	if someZero(u.Username, u.Password, u.PublicKey) {
 		return response{
 			Code:    errorMissingField,
-			Message: "`username` and `password` are required",
+			Message: "`username`, `password` and `public_key` are required",
 			HTTP:    http.StatusBadRequest,
-			Data:    []string{"username", "password"},
+			Data:    []string{"username", "password", "public_key"},
 		}
 	}
 
