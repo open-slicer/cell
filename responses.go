@@ -1,14 +1,14 @@
 package main
 
-type errorCode int
+type statusCode int
 
 const (
-	errorInternalError errorCode = iota
+	errorInternalError statusCode = iota
 	errorExists
 )
 
-type errorResponse struct {
-	Code    errorCode `json:"code"`
-	Message string    `json:"message"`
-	HTTP    int       `json:"-"`
+type response struct {
+	Code    statusCode `json:"code"`
+	Message string     `json:"message"`
+	HTTP    int        `json:"-"`
 }
