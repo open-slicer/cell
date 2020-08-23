@@ -95,7 +95,7 @@ func (u *user) insert() response {
 	// Make sure to hide the password.
 	u.Password = ""
 	return response{
-		Code:    http.StatusOK,
+		Code:    http.StatusCreated,
 		Message: "User created",
 		Data:    u,
 	}
