@@ -46,6 +46,13 @@ func (u *user) insert() response {
 			HTTP:    http.StatusBadRequest,
 		}
 	}
+	if len(u.DisplayName) > 32 {
+		return response{
+			Code:    errorTooLarge,
+			Message: "Username must be less than 32 characters",
+			HTTP:    http.StatusBadRequest,
+		}
+	}
 	if !usernameRegex.MatchString(u.Username) {
 		return response{
 			Code:    errorDidntMatch,
