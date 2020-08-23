@@ -3,15 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
+	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/nbutton23/zxcvbn-go"
 	"github.com/rs/xid"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 )
 
 var usernameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
@@ -133,4 +137,54 @@ func handleUsersPost(c *gin.Context) {
 	}
 
 	user.insert().send(c)
+}
+
+const identityKey = "id"
+
+func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
+	return jwt.New(&jwt.GinJWTMiddleware{
+		Realm:       "slicer",
+		Key:         []byte(viper.GetString("security.secret")),
+		IdentityKey: identityKey,
+		MaxRefresh:  time.Hour * 48,
+		TokenLookup: "header: Authorization, query: token",
+		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			if v, ok := data.(*user); ok {
+				return jwt.MapClaims{
+					identityKey: v.ID,
+				}
+			}
+			return jwt.MapClaims{}
+		},
+		IdentityHandler: func(c *gin.Context) interface{} {
+			claims := jwt.ExtractClaims(c)
+			return &user{
+				ID: claims[identityKey].([]byte),
+			}
+		},
+		Authenticator: func(c *gin.Context) (interface{}, error) {
+			var req user
+			if err := c.BindJSON(&req); err != nil {
+				return "", jwt.ErrMissingLoginValues
+			}
+
+			var userDoc user
+
+			ctx, _ := context.WithTimeout(context.Background(), callTimeout)
+			if err := db.users.FindOne(ctx, bson.M{
+				"username": req.Username,
+			}).Decode(&userDoc); err != nil {
+				if err != mongo.ErrNoDocuments {
+					sentry.CaptureException(err)
+				}
+				return nil, jwt.ErrFailedAuthentication
+			}
+
+			if err := bcrypt.CompareHashAndPassword(userDoc.PasswordHash, []byte(req.Password)); err != nil {
+				return nil, jwt.ErrFailedAuthentication
+			}
+
+			return userDoc, nil
+		},
+	})
 }
