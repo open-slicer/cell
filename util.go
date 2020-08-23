@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"time"
 )
@@ -85,8 +86,7 @@ type internalErrorData struct {
 }
 
 func internalError(err error) response {
-	eventID := string(*sentry.CaptureException(err))
-
+	eventID := captureException(err)
 	return response{
 		Code:    errorInternalError,
 		Message: "An internal server error was encountered and it was recorded",
@@ -95,4 +95,10 @@ func internalError(err error) response {
 			EventID: eventID,
 		},
 	}
+}
+
+func captureException(err error) string {
+	eventID := string(*sentry.CaptureException(err))
+	log.Error().Str("id", eventID).Err(err).Msg("Exception captured")
+	return eventID
 }
