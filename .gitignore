@@ -16,3 +16,6 @@
 
 # IDEs
 .idea
+
+# Configs
+/config.*
