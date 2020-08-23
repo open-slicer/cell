@@ -34,7 +34,7 @@ func (u *user) insert() response {
 	if len(u.Password) > 72 {
 		return response{
 			Code:    errorTooLarge,
-			Message: "Passwords must be less than 72 characters",
+			Message: "Password must be less than 72 characters",
 			HTTP:    http.StatusBadRequest,
 		}
 	}
