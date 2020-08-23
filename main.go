@@ -29,9 +29,13 @@ func main() {
 	}
 
 	if dsn := viper.GetString("sentry.dsn"); dsn != "" {
-		log.Err(sentry.Init(sentry.ClientOptions{
+		log.Debug().Err(err).Str("dsn", dsn).Msg("Initialising Sentry")
+		err := sentry.Init(sentry.ClientOptions{
 			Dsn: dsn,
-		})).Msg("Initialising Sentry")
+		})
+		if err != nil {
+			log.Error().Err(err).Str("dsn", dsn).Msg("Initialising Sentry")
+		}
 	}
 
 	db = &database{
@@ -51,7 +55,7 @@ func main() {
 		keyFile := viper.GetString("security.key_file")
 		err = r.RunTLS(addr, certFile, keyFile)
 		if err != nil {
-			log.Fatal().Err(err).Msg("Running HTTP server (tls)")
+			log.Fatal().Bool("tls", true).Str("addr", addr).Err(err).Msg("Running HTTP server")
 		}
 	}
 
