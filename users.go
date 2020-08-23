@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
-	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/nbutton23/zxcvbn-go"
 	"github.com/rs/xid"
@@ -174,7 +173,7 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 				"username": req.Username,
 			}).Decode(&userDoc); err != nil {
 				if err != mongo.ErrNoDocuments {
-					sentry.CaptureException(err)
+					captureException(err)
 				}
 				return nil, jwt.ErrFailedAuthentication
 			}
