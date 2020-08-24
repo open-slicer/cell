@@ -37,6 +37,7 @@ func (u *user) insert() response {
 		}
 	}
 
+	// TODO(#12): DRY
 	passwordLen := len(u.Password)
 	if passwordLen > 72 {
 		return response{
@@ -50,14 +51,15 @@ func (u *user) insert() response {
 			},
 		}
 	}
-	if len(u.Username) > 32 || len(u.DisplayName) > 32 {
+	usernameLen := len(u.Username)
+	if usernameLen > 32 || len(u.DisplayName) > 32 {
 		return response{
 			Code:    errorTooLarge,
 			Message: "Username and display name must be less than 32 characters",
 			HTTP:    http.StatusBadRequest,
 			Data: tooLargeData{
 				Offending: []string{"username", "display_name"},
-				Got:       passwordLen,
+				Got:       usernameLen,
 				Want:      32,
 			},
 		}
