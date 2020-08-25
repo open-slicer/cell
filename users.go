@@ -28,45 +28,15 @@ type user struct {
 	PasswordHash []byte `json:"-" bson:"password_hash"`
 }
 
-func (u *user) insert() response {
-	if someZero(u.Username, u.Password, u.PublicKey) {
-		return response{
-			Code:    errorMissingField,
-			Message: "`username`, `password` and `public_key` are required",
-			HTTP:    http.StatusBadRequest,
-			Data:    []string{"username", "password", "public_key"},
-		}
-	}
+type userInsertion struct {
+	Username    string `json:"username" binding:"required,gte=1,lte=32"`
+	DisplayName string `json:"display_name" binding:"required,gte=1,lte=32"`
+	PublicKey   []byte `json:"public_key" binding:"required"`
+	Password    string `json:"password" binding:"required,gte=1,lte=72"`
+}
 
-	// TODO(#12): DRY
-	passwordLen := len(u.Password)
-	if passwordLen > 72 {
-		return response{
-			Code:    errorTooLarge,
-			Message: "Password must be less than 72 characters",
-			HTTP:    http.StatusBadRequest,
-			Data: tooLargeData{
-				Offending: []string{"password"},
-				Got:       passwordLen,
-				Want:      72,
-			},
-		}
-	}
-	usernameLen := len(u.Username)
-	if usernameLen > 32 || len(u.DisplayName) > 32 {
-		return response{
-			Code:    errorTooLarge,
-			Message: "Username and display name must be less than 32 characters",
-			HTTP:    http.StatusBadRequest,
-			Data: tooLargeData{
-				Offending: []string{"username", "display_name"},
-				Got:       usernameLen,
-				Want:      32,
-			},
-		}
-	}
-
-	if !usernameRegex.MatchString(u.Username) {
+func (req *userInsertion) insert() response {
+	if !usernameRegex.MatchString(req.Username) {
 		return response{
 			Code:    errorDidntMatch,
 			Message: "Username didn't match the required regex",
@@ -75,7 +45,7 @@ func (u *user) insert() response {
 		}
 	}
 
-	passStrength := zxcvbn.PasswordStrength(u.Password, []string{u.Username, u.DisplayName})
+	passStrength := zxcvbn.PasswordStrength(req.Password, []string{req.Username, req.DisplayName})
 	if passStrength.Score < 3 {
 		return response{
 			Code:    errorPasswordInsecure,
@@ -89,11 +59,11 @@ func (u *user) insert() response {
 
 	ctx, _ := context.WithTimeout(context.Background(), callTimeout)
 	if err := db.users.FindOne(ctx, bson.M{
-		"username": u.Username,
+		"username": req.Username,
 	}).Decode(&fetchedUser); err == nil {
 		return response{
 			Code:    errorExists,
-			Message: fmt.Sprintf("A user with the username %s already exists", u.Username),
+			Message: fmt.Sprintf("A user with the username %s already exists", req.Username),
 			HTTP:    http.StatusConflict,
 			Data:    fetchedUser,
 		}
@@ -101,17 +71,17 @@ func (u *user) insert() response {
 		return internalError(err)
 	}
 
-	var err error
-	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return internalError(err)
-	}
-
-	u.ID = xid.New().String()
+	u := user{ID: xid.New().String()}
 	if u.DisplayName == "" {
 		u.DisplayName = u.Username
 	} else {
 		u.DisplayName = strings.TrimSpace(u.DisplayName)
+	}
+
+	var err error
+	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return internalError(err)
 	}
 
 	if _, err := db.users.InsertOne(ctx, u); err != nil {
@@ -127,7 +97,7 @@ func (u *user) insert() response {
 }
 
 func handleUsersPost(c *gin.Context) {
-	user := user{}
+	user := userInsertion{}
 	if err := c.ShouldBindJSON(&user); err != nil {
 		response{
 			Code:    errorBindFailed,
