@@ -128,11 +128,12 @@ func (u *user) insert() response {
 
 func handleUsersPost(c *gin.Context) {
 	user := user{}
-	if err := c.BindJSON(&user); err != nil {
+	if err := c.ShouldBindJSON(&user); err != nil {
 		response{
 			Code:    errorBindFailed,
 			Message: "Failed to bind JSON",
 			HTTP:    http.StatusBadRequest,
+			Data:    err.Error(),
 		}.send(c)
 		return
 	}
