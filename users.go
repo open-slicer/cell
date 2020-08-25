@@ -38,7 +38,7 @@ type userInsertion struct {
 func (req *userInsertion) insert() response {
 	if !usernameRegex.MatchString(req.Username) {
 		return response{
-			Code:    errorDidntMatch,
+			Code:    errorBindFailed,
 			Message: "Username didn't match the required regex",
 			HTTP:    http.StatusBadRequest,
 			Data:    usernameRegex.String(),
