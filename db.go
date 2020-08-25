@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
+	"time"
+
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"time"
 )
 
 const callTimeout = 4 * time.Second

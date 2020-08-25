@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"regexp"
+	"strings"
+
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/nbutton23/zxcvbn-go"
@@ -11,9 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"regexp"
-	"strings"
 )
 
 var usernameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")

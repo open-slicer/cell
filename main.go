@@ -1,12 +1,13 @@
 package main
 
 import (
+	"os"
+
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var r = gin.Default()
