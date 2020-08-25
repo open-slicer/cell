@@ -17,7 +17,7 @@ var db *database
 type database struct {
 	uri string
 
-	c            *mongo.Client
+	client       *mongo.Client
 	mainDatabase *mongo.Database
 	users        *mongo.Collection
 }
@@ -27,18 +27,18 @@ func (d *database) connect() error {
 	var err error
 
 	ctx, _ := context.WithTimeout(context.Background(), callTimeout)
-	d.c, err = mongo.Connect(ctx, options.Client().ApplyURI(d.uri))
+	d.client, err = mongo.Connect(ctx, options.Client().ApplyURI(d.uri))
 	if err != nil {
 		return err
 	}
 
 	ctx, _ = context.WithTimeout(context.Background(), callTimeout)
-	err = d.c.Ping(ctx, readpref.Primary())
+	err = d.client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		return err
 	}
 
-	d.mainDatabase = d.c.Database("cell")
+	d.mainDatabase = d.client.Database("cell")
 	d.users = d.mainDatabase.Collection("users")
 	return nil
 }
