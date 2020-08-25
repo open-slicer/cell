@@ -30,7 +30,7 @@ type user struct {
 
 type userInsertion struct {
 	Username    string `json:"username" binding:"required,gte=1,lte=32"`
-	DisplayName string `json:"display_name" binding:"gte=1,lte=32"`
+	DisplayName string `json:"display_name" binding:"lte=32"`
 	PublicKey   []byte `json:"public_key" binding:"required"`
 	Password    string `json:"password" binding:"required,gte=1,lte=72"`
 }
