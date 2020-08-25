@@ -24,7 +24,6 @@ type user struct {
 	Username     string `json:"username" bson:"username"`
 	DisplayName  string `json:"display_name" bson:"display_name"`
 	PublicKey    []byte `json:"public_key" bson:"public_key"`
-	Password     string `json:"password,omitempty" bson:"-"`
 	PasswordHash []byte `json:"-" bson:"password_hash"`
 }
 
@@ -33,6 +32,11 @@ type userInsertion struct {
 	DisplayName string `json:"display_name" binding:"lte=32"`
 	PublicKey   []byte `json:"public_key" binding:"required"`
 	Password    string `json:"password" binding:"required,gte=1,lte=72"`
+}
+
+type userLogin struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 func (req *userInsertion) insert() response {
@@ -79,7 +83,7 @@ func (req *userInsertion) insert() response {
 	}
 
 	var err error
-	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return internalError(err)
 	}
@@ -87,8 +91,6 @@ func (req *userInsertion) insert() response {
 	if _, err := db.users.InsertOne(ctx, u); err != nil {
 		return internalError(err)
 	}
-	// Make sure to hide the password.
-	u.Password = ""
 	return response{
 		Code:    http.StatusCreated,
 		Message: "User created",
@@ -164,8 +166,8 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var req user
-			if err := c.BindJSON(&req); err != nil {
+			var req userLogin
+			if err := c.ShouldBindJSON(&req); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
 
