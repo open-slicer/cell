@@ -10,8 +10,8 @@ import (
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("toml")
+	viper.SetConfigName("locketd")
+	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
