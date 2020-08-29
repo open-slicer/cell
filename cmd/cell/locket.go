@@ -8,8 +8,6 @@ import (
 	"net/http"
 )
 
-var locketToken string
-
 var previousLockets = map[string]bool{}
 
 type locketInterface struct {
@@ -114,18 +112,4 @@ func (locket *locketInterface) get() response {
 func handleLocketGet(c *gin.Context) {
 	locket := locketInterface{}
 	locket.get().send(c)
-}
-
-func locketAuthMiddleware(c *gin.Context) {
-	if c.GetHeader("Authorization") != locketToken {
-		response{
-			Code:    errorInvalidLocketAuth,
-			Message: "Authorization header didn't contain the required token (config.locket.token)",
-			HTTP:    http.StatusUnauthorized,
-		}.send(c)
-		c.Abort()
-		return
-	}
-
-	c.Next()
 }
