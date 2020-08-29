@@ -13,3 +13,5 @@ For example, to send a message you'd make a REST POST request to `/api/v2/channe
 ## Encryption
 
 Message encryption is done with PGP. This must be done on the client; otherwise, it'd deprecate the point of Slicer! The only thing Cell has to do about encryption is message validation and public key storage. On top of this, passwords are hashed with [bcrypt](https://en.wikipedia.org/wiki/Bcrypt).
+
+This will be covered in more detail.
