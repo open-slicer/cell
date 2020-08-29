@@ -1,6 +1,9 @@
 site_name: Cell Manual
 site_url: http://slicer.softwares.software/cell
 site_dir: public
+site_description: The documentation for the reference implementartion of Slicer.
+
+copyright: Copyright © 2020 Alex P, CC-BY.
 
 repo_url: https://owo.gg/slicer/cell
 repo_name: GitLab
