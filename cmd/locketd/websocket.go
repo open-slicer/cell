@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-redis/redis/v8"
 	"github.com/rs/xid"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
@@ -44,7 +45,7 @@ func newWebsocketServer() *websocketServer {
 
 type subscriber struct {
 	id        string
-	msgs      chan []byte
+	messages  <-chan *redis.Message
 	closeSlow func()
 }
 
@@ -110,9 +111,16 @@ func (srv *websocketServer) subscribeHandler(w http.ResponseWriter, r *http.Requ
 func (srv *websocketServer) subscribe(ctx context.Context, c *websocket.Conn, userID string) error {
 	ctx = c.CloseRead(ctx)
 
+	pubsub := rdb.Subscribe(ctx, "locketuser:"+userID)
+	_, err := pubsub.Receive(ctx)
+	if err != nil {
+		return err
+	}
+	ch := pubsub.Channel()
+
 	s := &subscriber{
-		id:   xid.New().String(),
-		msgs: make(chan []byte, srv.subscriberMessageBuffer),
+		id:       xid.New().String(),
+		messages: ch,
 		closeSlow: func() {
 			c.Close(websocket.StatusPolicyViolation, "Connection couldn't keep up; too slow")
 		},
@@ -122,8 +130,8 @@ func (srv *websocketServer) subscribe(ctx context.Context, c *websocket.Conn, us
 
 	for {
 		select {
-		case msg := <-s.msgs:
-			err := writeTimeout(ctx, time.Second*5, c, msg)
+		case msg := <-s.messages:
+			err := writeTimeout(ctx, time.Second*5, c, []byte(msg.Payload))
 			if err != nil {
 				return err
 			}
@@ -146,7 +154,7 @@ func (srv *websocketServer) publish(userID string, msg []byte) bool {
 
 	for _, s := range subs {
 		select {
-		case s.msgs <- msg:
+		case s.messages <- msg:
 			return true
 		default:
 			go s.closeSlow()
