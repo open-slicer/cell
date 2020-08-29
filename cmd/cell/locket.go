@@ -10,12 +10,14 @@ import (
 
 var locketToken string
 
-type locketInsertion struct {
+var previousLockets = map[string]bool{}
+
+type locketInterface struct {
 	Port int    `json:"port" binding:"required"`
 	Host string `json:"host"`
 }
 
-func (locket *locketInsertion) insert(ipAddr string) response {
+func (locket *locketInterface) insert(ipAddr string) response {
 	if locket.Host != "" {
 		resolved := false
 
@@ -59,7 +61,7 @@ func (locket *locketInsertion) insert(ipAddr string) response {
 }
 
 func handleLocketPut(c *gin.Context) {
-	locket := locketInsertion{}
+	locket := locketInterface{}
 	if err := c.ShouldBindJSON(&locket); err != nil {
 		response{
 			Code:    errorBindFailed,
@@ -71,6 +73,43 @@ func handleLocketPut(c *gin.Context) {
 	}
 
 	locket.insert(c.ClientIP()).send(c)
+}
+
+func (locket *locketInterface) get() response {
+	res, err := rdb.HGetAll(context.Background(), "").Result()
+	if err != nil {
+		return internalError(err)
+	}
+
+	for _, hostname := range res {
+		if used, ok := previousLockets[hostname]; !ok || !used {
+			previousLockets[hostname] = true
+			return response{
+				Code:    http.StatusOK,
+				Message: "Locket found",
+				Data:    hostname,
+			}
+		}
+	}
+
+	// If we haven't returned yet, all lockets were used.
+	previousLockets = map[string]bool{}
+
+	var genesisLocket string
+	for _, hostname := range res {
+		genesisLocket = hostname
+		break
+	}
+	return response{
+		Code:    http.StatusOK,
+		Message: "Locket found (reset)",
+		Data:    genesisLocket,
+	}
+}
+
+func handleLocketGet(c *gin.Context) {
+	locket := locketInterface{}
+	locket.get().send(c)
 }
 
 func locketAuthMiddleware(c *gin.Context) {
