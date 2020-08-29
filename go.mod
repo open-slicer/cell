@@ -3,6 +3,7 @@ module cell
 go 1.15
 
 require (
+	github.com/JakeMakesStuff/structuredhttp v0.0.0-20200614104234-f8e4b2aebe68 // indirect
 	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/getsentry/sentry-go v0.7.0
 	github.com/gin-gonic/gin v1.6.3
