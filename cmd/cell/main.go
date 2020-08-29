@@ -21,8 +21,8 @@ func main() {
 		log.Info().Msg("Environment isn't 'release'; using trace level")
 	}
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("toml")
+	viper.SetConfigName("cell")
+	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
