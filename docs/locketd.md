@@ -4,13 +4,21 @@
 
 ## API
 
-The Locket API's main endpoint is `/api/v2/lockets`. It expects the config value for `locket.token` to be present in the `Authorization` header.
+The Locket API's main endpoint is `/api/v2/lockets`.
+
+### Getting a Locket
+
+As a client (not a server like `locketd`), you may request to be assigned a Locket. This is required for WebSocket operations. To do this, you can make a GET request to `/api/v2/lockets`. This requires a bearer token.
+
+#### Response
+
+You'll receive an application/json response body. The data key will be a string representing the address at which you can access the Locket: `domainOrIP:port`.
 
 ### Registering a Locket
 
-Lockets can be registered by making a `PUT` request to `/api/v2/lockets`.
+Lockets can be registered by making a `PUT` request to `/api/v2/lockets`. This expects the config value for `locket.token` to be present in the `Authorization` header.
 
-#### Body
+#### Request
 
 It expects an application/json body:
 
