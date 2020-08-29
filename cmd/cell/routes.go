@@ -28,7 +28,7 @@ func setupRoutes() {
 		locket := v2.Group("/locket")
 		{
 			locket.Use(locketAuthMiddleware)
-			locket.POST("/", handleLocketPost)
+			locket.PUT("/", handleLocketPut)
 		}
 	}
 }
