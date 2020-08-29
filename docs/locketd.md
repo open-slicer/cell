@@ -23,7 +23,7 @@ It expects an application/json body:
 
 ##### `port`
 
-Required. This is the port that the Locket server is running on.
+Required. This is the TCP port that the Locket server is listening on.
 
 ##### `host`
 
