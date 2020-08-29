@@ -2,13 +2,17 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/JakeMakesStuff/structuredhttp"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
+	"net"
+	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
 	"path"
 	"time"
 )
@@ -47,6 +51,36 @@ func main() {
 	if rdb, err = redisConnect(regData.Address, regData.Password, regData.DB); err != nil {
 		log.Fatal().Err(err).Str("address", regData.Address).Msg("Failed to connect to Redis")
 	}
+
+	addr := fmt.Sprintf(":%d", viper.GetInt("port"))
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatal().Err(err).Str("address", addr).Msg("Failed to listen")
+	}
+	log.Info().Str("address", l.Addr().String()).Msg("Listening (tcp)")
+
+	s := &http.Server{
+		Handler:      websocketServer{},
+		ReadTimeout:  time.Second * 10,
+		WriteTimeout: time.Second * 10,
+	}
+	errc := make(chan error, 1)
+	go func() {
+		errc <- s.Serve(l)
+	}()
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, os.Interrupt)
+	select {
+	case err := <-errc:
+		log.Error().Err(err).Msg("Failed to serve")
+	case <-sigs:
+		log.Info().Msg("Interrupt received, gracefully exiting")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+	_ = s.Shutdown(ctx)
 }
 
 func register() registrationResponse {
