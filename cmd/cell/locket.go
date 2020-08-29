@@ -76,7 +76,7 @@ func handleLocketPut(c *gin.Context) {
 }
 
 func (locket *locketInterface) get() response {
-	res, err := rdb.HGetAll(context.Background(), "").Result()
+	res, err := rdb.HGetAll(context.Background(), "lockets").Result()
 	if err != nil {
 		return internalError(err)
 	}
