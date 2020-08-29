@@ -1,6 +1,6 @@
 # Introduction
 
-Welcome to the Cell documentation. Currently, it's expected that Cell's API will change _a lot_; it's in early stages. This manual should act as developers' documentation for **API v2**, available at the `/api/v2` endpoint.
+Welcome to the Cell documentation. Currently, it's expected that Cell's API will change _a lot_; it's in early stages. This manual should act as developers' documentation for **API v2**, but also a reference for contributors to Cell.
 
 API v1 is deprecated and isn't available in Cell.
 
