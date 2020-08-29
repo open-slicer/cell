@@ -16,8 +16,11 @@ func setupRoutes() {
 		authMiddleware, _ := getAuthMiddleware()
 		authBlock := authMiddleware.MiddlewareFunc()
 
-		v2.POST("/users", handleUsersPost)
-		v2.GET("/users/:id", authBlock, handleUsersGet)
+		users := v2.Group("/users")
+		{
+			users.POST("/", handleUsersPost)
+			users.GET("/:id", authBlock, handleUsersGet)
+		}
 
 		auth := v2.Group("/auth")
 		{
