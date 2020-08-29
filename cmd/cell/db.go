@@ -46,13 +46,15 @@ func (d *mongoWrapper) connect() error {
 }
 
 func redisConnect(address, password string, db int) (*redis.Client, error) {
-	log.Debug().Str("address", address).Msg("Connecting to Redis")
+	log.Debug().Str("address", address).Dur("timeout", callTimeout).Msg("Connecting to Redis")
 
 	client := redis.NewClient(&redis.Options{
 		Addr:     address,
 		Password: password,
 		DB:       db,
 	})
-	_, err := client.Ping(context.Background()).Result()
+	ctx, _ := context.WithTimeout(context.Background(), callTimeout)
+	_, err := client.Ping(ctx).Result()
+
 	return client, err
 }
