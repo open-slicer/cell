@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/go-redis/redis/v8"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -12,6 +13,7 @@ import (
 
 const callTimeout = 4 * time.Second
 
+var rdb *redis.Client
 var mng *mongoWrapper
 
 type mongoWrapper struct {
@@ -41,4 +43,16 @@ func (d *mongoWrapper) connect() error {
 	d.mainDatabase = d.client.Database("cell")
 	d.users = d.mainDatabase.Collection("users")
 	return nil
+}
+
+func redisConnect(address, password string, db int) (*redis.Client, error) {
+	log.Debug().Str("address", address).Msg("Connecting to Redis")
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     address,
+		Password: password,
+		DB:       db,
+	})
+	_, err := client.Ping(context.Background()).Result()
+	return client, err
 }

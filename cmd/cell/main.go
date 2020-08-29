@@ -46,6 +46,13 @@ func main() {
 		log.Fatal().Err(err).Str("uri", mng.uri).Msg("Connecting to MongoDB")
 	}
 
+	redisAddr := viper.GetString("database.redis.address")
+	if rdb, err = redisConnect(
+		redisAddr, viper.GetString("database.redis.password"), viper.GetInt("database.redis.db"),
+	); err != nil {
+		log.Fatal().Err(err).Str("address", redisAddr)
+	}
+
 	gin.SetMode(environment)
 	setupRoutes()
 
