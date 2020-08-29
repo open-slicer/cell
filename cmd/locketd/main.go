@@ -26,11 +26,11 @@ type registration struct {
 	Host string `json:"host"`
 }
 
-type genericResponse struct {
-	Data interface{} `json:"data"`
+type registrationResponse struct {
+	Data registrationResponseData `json:"data"`
 }
 
-type registrationResponse struct {
+type registrationResponseData struct {
 	Address  string `json:"address"`
 	Password string `json:"password"`
 	DB       int    `json:"db"`
@@ -83,7 +83,7 @@ func main() {
 	_ = s.Shutdown(ctx)
 }
 
-func register() registrationResponse {
+func register() registrationResponseData {
 	apiURL, err := url.Parse(viper.GetString("registration.home"))
 	if err != nil {
 		log.Fatal().Err(err).Msg("Invalid home URL")
@@ -100,17 +100,17 @@ func register() registrationResponse {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Registration request threw an error")
 	}
-
 	err = response.RaiseForStatus()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Received bad status code when registering")
 	}
-	respData, err := response.JSON()
-	if err != nil {
+
+	var respData registrationResponse
+	if err = response.JSONToPointer(&respData); err != nil {
 		log.Fatal().Err(err).Msg("Couldn't unmarshal response data")
 	}
 
-	return respData.(genericResponse).Data.(registrationResponse)
+	return respData.Data
 }
 
 func redisConnect(address, password string, db int) (*redis.Client, error) {
