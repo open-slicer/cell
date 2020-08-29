@@ -60,7 +60,7 @@ func main() {
 	log.Info().Str("address", l.Addr().String()).Msg("Listening (tcp)")
 
 	s := &http.Server{
-		Handler:      websocketServer{},
+		Handler:      newWebsocketServer(),
 		ReadTimeout:  time.Second * 10,
 		WriteTimeout: time.Second * 10,
 	}
