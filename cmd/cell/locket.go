@@ -12,7 +12,7 @@ var locketToken string
 
 type locketInsertion struct {
 	Port int    `json:"port" binding:"required"`
-	Host string `json:"domain"`
+	Host string `json:"host"`
 }
 
 func (locket *locketInsertion) insert(ipAddr string) response {
