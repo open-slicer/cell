@@ -12,7 +12,7 @@ As a client (not a server like `locketd`), you may request to be assigned a Lock
 
 #### Response
 
-You'll receive an application/json response body. The data key will be a string representing the address at which you can access the Locket: `domainOrIP:port`.
+You'll receive an application/json response body. The `data` will be a string representing the address at which you can access the Locket: `domainOrIP:port`.
 
 ### Registering a Locket
 
@@ -38,6 +38,17 @@ Required. This is the TCP port that the Locket server is listening on.
 Defaults to the request IP. If provided, this should be a domain that points to the request IP.
 
 If there was an error looking up the domain, `errorDomainFailedLookup` will be thrown. If the lookup succeeded but the resulting IPs didn't include the request IP, `errorDomainDidntMatch` will be thrown.
+
+#### Response
+
+You'll receive an application/json response. Its `data` will be a `locketInterface` object:
+
+```json
+{
+  "port": 8080,
+  "host": "some.optional.locket.com"
+}
+```
 
 #### Errors
 
