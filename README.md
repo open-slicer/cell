@@ -1,6 +1,6 @@
 # Cell
 
-This repository hosts SlicerCell, the reference implementation of the Slicer server.
+This repository hosts SlicerCell, the reference implementation of the Slicer server. [Documentation](http://slicer.softwares.software/cell)
 
 ## License
 
