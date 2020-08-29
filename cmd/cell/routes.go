@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,11 @@ func setupRoutes() {
 	{
 		authMiddleware, _ := getAuthMiddleware()
 		authBlock := authMiddleware.MiddlewareFunc()
+
+		promHandler := promhttp.Handler()
+		v2.GET("/metrics", configAuthMiddleware("prometheus.token"), func(c *gin.Context) {
+			promHandler.ServeHTTP(c.Writer, c.Request)
+		})
 
 		users := v2.Group("/users")
 		{
@@ -31,7 +37,7 @@ func setupRoutes() {
 		locket := v2.Group("/lockets")
 		{
 			locket.GET("/", handleLocketGet)
-			locket.PUT("/", locketAuthMiddleware, handleLocketPut)
+			locket.PUT("/", configAuthMiddleware("locket.token"), handleLocketPut)
 		}
 	}
 }
