@@ -50,7 +50,7 @@ func main() {
 	if rdb, err = redisConnect(
 		redisAddr, viper.GetString("database.redis.password"), viper.GetInt("database.redis.db"),
 	); err != nil {
-		log.Fatal().Err(err).Str("address", redisAddr)
+		log.Fatal().Err(err).Str("address", redisAddr).Msg("Failed to connect to Redis")
 	}
 
 	gin.SetMode(environment)
@@ -58,13 +58,13 @@ func main() {
 
 	addr := viper.GetString("http.address")
 	if certFile := viper.GetString("security.cert_file"); certFile != "" {
-		log.Debug().Bool("tls", true).Str("addr", addr).Msg("Running HTTP server")
+		log.Debug().Bool("tls", true).Str("addr", addr).Msg("Running HTTP server with TLS")
 
 		// Let's assume key_file is present.
 		keyFile := viper.GetString("security.key_file")
 		err = r.RunTLS(addr, certFile, keyFile)
 		if err != nil {
-			log.Fatal().Bool("tls", true).Str("addr", addr).Err(err).Msg("Running HTTP server")
+			log.Fatal().Bool("tls", true).Str("addr", addr).Err(err).Msg("Failed to start HTTP server")
 		}
 	}
 
