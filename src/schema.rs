@@ -4,6 +4,5 @@ table! {
         username -> Varchar,
         display_name -> Varchar,
         public_key -> Text,
-        password_hash -> Varchar,
     }
 }
