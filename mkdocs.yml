@@ -14,5 +14,4 @@ markdown_extensions:
   - admonition
 
 theme:
-  name: mkdocs
-  highlightjs: true
+  name: material
