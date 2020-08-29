@@ -20,7 +20,7 @@ const (
 	errorBindFailed
 	errorNotFound
 	errorInvalidLocketAuth
-	errorDomainDidntResolve
+	errorDomainFailedLookup
 	errorDomainDidntMatch
 )
 
