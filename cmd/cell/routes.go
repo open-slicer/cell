@@ -24,5 +24,11 @@ func setupRoutes() {
 			auth.POST("/login", authMiddleware.LoginHandler)
 			auth.GET("/refresh", authMiddleware.RefreshHandler)
 		}
+
+		locket := v2.Group("/locket")
+		{
+			locket.Use(locketAuthMiddleware)
+			locket.POST("/", handleLocketPost)
+		}
 	}
 }
