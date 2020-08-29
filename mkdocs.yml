@@ -16,5 +16,3 @@ markdown_extensions:
 theme:
   name: mkdocs
   highlightjs: true
-  hljs_languages:
-    - toml
