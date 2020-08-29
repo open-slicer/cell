@@ -39,11 +39,11 @@ func main() {
 		}
 	}
 
-	db = &database{
+	mng = &mongoWrapper{
 		uri: viper.GetString("database.mongodb"),
 	}
-	if err := db.connect(); err != nil {
-		log.Fatal().Err(err).Str("uri", db.uri).Msg("Connecting to MongoDB")
+	if err := mng.connect(); err != nil {
+		log.Fatal().Err(err).Str("uri", mng.uri).Msg("Connecting to MongoDB")
 	}
 
 	gin.SetMode(environment)

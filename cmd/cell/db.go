@@ -12,9 +12,9 @@ import (
 
 const callTimeout = 4 * time.Second
 
-var db *database
+var mng *mongoWrapper
 
-type database struct {
+type mongoWrapper struct {
 	uri string
 
 	client       *mongo.Client
@@ -22,8 +22,8 @@ type database struct {
 	users        *mongo.Collection
 }
 
-func (d *database) connect() error {
-	log.Debug().Str("uri", db.uri).Dur("timeout", callTimeout).Msg("Connecting to MongoDB")
+func (d *mongoWrapper) connect() error {
+	log.Debug().Str("uri", mng.uri).Dur("timeout", callTimeout).Msg("Connecting to MongoDB")
 	var err error
 
 	ctx, _ := context.WithTimeout(context.Background(), callTimeout)
