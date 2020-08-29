@@ -21,6 +21,8 @@ var callTimeout = time.Second * 4
 
 var rdb *redis.Client
 
+var jwtSecret []byte
+
 type registration struct {
 	Port int    `json:"port"`
 	Host string `json:"host"`
@@ -46,6 +48,8 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Couldn't read config")
 	}
+
+	jwtSecret = []byte(viper.GetString("security.secret"))
 
 	regData := register()
 	if rdb, err = redisConnect(regData.Address, regData.Password, regData.DB); err != nil {
