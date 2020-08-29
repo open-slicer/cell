@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
@@ -44,7 +45,9 @@ func (locket *locketInsertion) insert(ipAddr string) response {
 		locket.Host = ipAddr
 	}
 
-	err := rdb.HSet(context.Background(), "lockets", ipAddr, locket.Host).Err()
+	err := rdb.HSet(
+		context.Background(), "lockets", ipAddr, fmt.Sprintf("%s:%d", locket.Host, locket.Port),
+	).Err()
 	if err != nil {
 		return internalError(err)
 	}
