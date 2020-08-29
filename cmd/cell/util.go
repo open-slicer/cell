@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/spf13/viper"
 	"net/http"
 	"time"
 
@@ -19,7 +20,7 @@ const (
 	errorPasswordInsecure
 	errorBindFailed
 	errorNotFound
-	errorInvalidLocketAuth
+	errorInvalidConfigToken
 	errorDomainFailedLookup
 	errorDomainDidntMatch
 )
@@ -60,4 +61,20 @@ func captureException(err error) string {
 	eventID := string(*sentry.CaptureException(err))
 	log.Error().Str("id", eventID).Err(err).Msg("Exception captured")
 	return eventID
+}
+
+func configAuthMiddleware(configPath string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		if c.GetHeader("Authorization") != viper.GetString(configPath) {
+			response{
+				Code:    errorInvalidConfigToken,
+				Message: "Authorization header didn't contain the value of config." + configPath,
+				HTTP:    http.StatusUnauthorized,
+			}.send(c)
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
 }
