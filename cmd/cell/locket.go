@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"net"
 	"net/http"
 )
@@ -13,6 +14,13 @@ var previousLockets = map[string]bool{}
 type locketInterface struct {
 	Port int    `json:"port" binding:"required"`
 	Host string `json:"host"`
+}
+
+type locketPutResponse struct {
+	Address  string          `json:"address"`
+	Password string          `json:"password"`
+	DB       int             `json:"db"`
+	Locket   locketInterface `json:"locket"`
 }
 
 func (locket *locketInterface) insert(ipAddr string) response {
@@ -58,7 +66,12 @@ func (locket *locketInterface) insert(ipAddr string) response {
 	return response{
 		Code:    http.StatusCreated,
 		Message: "Locket added, expected to be ready",
-		Data:    locket,
+		Data: locketPutResponse{
+			Address:  viper.GetString("database.redis.address"),
+			Password: viper.GetString("database.redis.password"),
+			DB:       viper.GetInt("database.redis.db"),
+			Locket:   *locket,
+		},
 	}
 }
 
