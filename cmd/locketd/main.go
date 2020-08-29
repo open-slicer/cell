@@ -44,9 +44,7 @@ func main() {
 	}
 
 	regData := register()
-	if rdb, err = redisConnect(
-		regData.Address, regData.Password, regData.DB,
-	); err != nil {
+	if rdb, err = redisConnect(regData.Address, regData.Password, regData.DB); err != nil {
 		log.Fatal().Err(err).Str("address", regData.Address).Msg("Failed to connect to Redis")
 	}
 }
