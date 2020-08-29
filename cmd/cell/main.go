@@ -40,7 +40,7 @@ func main() {
 	}
 
 	db = &database{
-		uri: viper.GetString("database.uri"),
+		uri: viper.GetString("database.mongodb"),
 	}
 	if err := db.connect(); err != nil {
 		log.Fatal().Err(err).Str("uri", db.uri).Msg("Connecting to MongoDB")
