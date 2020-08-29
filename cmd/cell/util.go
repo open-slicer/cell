@@ -17,7 +17,6 @@ const (
 	errorInternalError statusCode = iota
 	errorExists
 	errorPasswordInsecure
-	errorTooLarge
 	errorBindFailed
 	errorNotFound
 )
