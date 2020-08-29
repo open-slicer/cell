@@ -4,3 +4,11 @@ site_dir: public
 
 repo_url: https://owo.gg/slicer/cell
 repo_name: GitLab
+
+markdown_extensions:
+  - toc:
+      permalink: "#"
+
+theme:
+  name: mkdocs
+  highlightjs: true
