@@ -52,16 +52,19 @@ func main() {
 }
 
 func register() registrationResponse {
-	apiURL, err := url.Parse(viper.GetString("url"))
+	apiURL, err := url.Parse(viper.GetString("registration.home"))
 	if err != nil {
-		log.Fatal().Err(err).Msg("Invalid URL (config.url)")
+		log.Fatal().Err(err).Msg("Invalid home URL")
 	}
 	apiURL.Path = path.Join(apiURL.Path, "api", "v2", "lockets")
 
-	response, err := structuredhttp.PUT(apiURL.String()).JSON(registration{
-		Port: viper.GetInt("registration.port"),
-		Host: viper.GetString("registration.host"),
-	}).Run()
+	response, err := structuredhttp.
+		PUT(apiURL.String()).
+		Header("Authorization", viper.GetString("registration.token")).
+		JSON(registration{
+			Port: viper.GetInt("port"),
+			Host: viper.GetString("registration.host"),
+		}).Run()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Registration request threw an error")
 	}
