@@ -13,19 +13,12 @@ import (
 type websocketServer struct{}
 
 func (s websocketServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
-		Subprotocols: []string{"locket"},
-	})
+	c, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("Couldn't accept ws connection")
 		return
 	}
 	defer c.Close(websocket.StatusInternalError, "Internal server error")
-
-	if c.Subprotocol() != "locket" {
-		_ = c.Close(websocket.StatusPolicyViolation, "Clients are required to speak the locket protocol")
-		return
-	}
 
 	l := rate.NewLimiter(rate.Every(time.Millisecond*100), 10)
 	for {
