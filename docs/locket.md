@@ -1,6 +1,8 @@
-# locketd
+# Locket
 
-`locketd` is a WebSocket server daemon for Cell that uses Cell's Locket API. This allows it to be horizontally scalable, as instances can register with the main Cell server by making an authorised HTTP request. Redis is used to dispatch requests to `locketd`; read more in the [scaling section](scaling.md).
+Locket is how Slicer clients can receive events and just partake in realtime web comms.
+
+`locketd` is Cell's implementation. It allows Cell to be horizontally scalable, as instances can register with the main Cell server by making an authorised HTTP request. Redis is used to dispatch requests to `locketd`; read more in the [scaling section](scaling.md).
 
 ## API
 
