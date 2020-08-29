@@ -20,4 +20,8 @@ security:
   secret: rh4NaXhju914cn60CHmuMREeQG1Qdh53o4sQ9iZWVlA= # A secure 32 byte key; try `openssl rand -base64 32`
   cert_file: ./some.crt # The optional SSL cert to use
   key_file: ./some.key # The optional SSL key to use
+locket:
+  token: some very secure password # The password to use to secure the `/lockets` endpoint
+prometheus:
+  token: some very secure password # The password to use to secure the `/metrics` endpoint
 ```
