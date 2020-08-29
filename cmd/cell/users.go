@@ -61,8 +61,7 @@ func (req *userInsertion) insert() response {
 
 	var fetchedUser user
 
-	ctx, _ := context.WithTimeout(context.Background(), callTimeout)
-	if err := mng.users.FindOne(ctx, bson.M{
+	if err := mng.users.FindOne(context.Background(), bson.M{
 		"username": req.Username,
 	}).Decode(&fetchedUser); err == nil {
 		return response{
@@ -88,7 +87,7 @@ func (req *userInsertion) insert() response {
 		return internalError(err)
 	}
 
-	if _, err := mng.users.InsertOne(ctx, u); err != nil {
+	if _, err := mng.users.InsertOne(context.Background(), u); err != nil {
 		return internalError(err)
 	}
 	return response{
@@ -114,8 +113,7 @@ func handleUsersPost(c *gin.Context) {
 }
 
 func (u *user) get() response {
-	ctx, _ := context.WithTimeout(context.Background(), callTimeout)
-	if err := mng.users.FindOne(ctx, bson.M{
+	if err := mng.users.FindOne(context.Background(), bson.M{
 		"_id": u.ID,
 	}).Decode(u); err != nil {
 		if err != mongo.ErrNoDocuments {
@@ -173,8 +171,7 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 
 			var userDoc user
 
-			ctx, _ := context.WithTimeout(context.Background(), callTimeout)
-			if err := mng.users.FindOne(ctx, bson.M{
+			if err := mng.users.FindOne(context.Background(), bson.M{
 				"username": req.Username,
 			}).Decode(&userDoc); err != nil {
 				if err != mongo.ErrNoDocuments {
