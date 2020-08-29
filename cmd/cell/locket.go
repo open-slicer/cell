@@ -119,6 +119,7 @@ func locketAuthMiddleware(c *gin.Context) {
 			Message: "Authorization header didn't contain the required token (config.locket.token)",
 			HTTP:    http.StatusUnauthorized,
 		}.send(c)
+		c.Abort()
 		return
 	}
 
