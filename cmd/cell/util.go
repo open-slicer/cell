@@ -20,6 +20,7 @@ const (
 	errorBindFailed
 	errorNotFound
 	errorInvalidLocketAuth
+	errorDomainDidntResolve
 )
 
 // response is a generic HTTP response. If HTTP is zeroed, Code should be used.
