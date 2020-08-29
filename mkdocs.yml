@@ -12,6 +12,10 @@ markdown_extensions:
   - toc:
       permalink: "#"
   - admonition
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      use_pygments: true
+      linenums: true
 
 theme:
   name: material
