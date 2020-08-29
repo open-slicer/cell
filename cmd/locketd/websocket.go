@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-redis/redis/v8"
 	"github.com/rs/xid"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
@@ -15,17 +14,6 @@ import (
 	"sync"
 	"time"
 )
-
-type opCode int
-
-const (
-	opAuthenticate opCode = iota
-)
-
-type message struct {
-	Op   opCode      `json:"op"`
-	Data interface{} `json:"d"`
-}
 
 type websocketServer struct {
 	subscriberMessageBuffer int
@@ -45,9 +33,11 @@ func newWebsocketServer() *websocketServer {
 
 type subscriber struct {
 	id        string
-	messages  <-chan *redis.Message
+	messages  chan []byte
 	closeSlow func()
 }
+
+var currentlyListening = map[string]bool{}
 
 func (srv *websocketServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	srv.subscribeHandler(w, r)
@@ -111,16 +101,25 @@ func (srv *websocketServer) subscribeHandler(w http.ResponseWriter, r *http.Requ
 func (srv *websocketServer) subscribe(ctx context.Context, c *websocket.Conn, userID string) error {
 	ctx = c.CloseRead(ctx)
 
-	pubsub := rdb.Subscribe(ctx, "locketuser:"+userID)
-	_, err := pubsub.Receive(ctx)
-	if err != nil {
-		return err
+	if listening, ok := currentlyListening[userID]; !ok || !listening {
+		currentlyListening[userID] = true
+		go func() {
+			pubsub := rdb.Subscribe(ctx, "locketuser:"+userID)
+			_, err := pubsub.Receive(ctx)
+			if err != nil {
+				return
+			}
+			ch := pubsub.Channel()
+
+			for msg := range ch {
+				srv.publish(userID, []byte(msg.Payload))
+			}
+		}()
 	}
-	ch := pubsub.Channel()
 
 	s := &subscriber{
 		id:       xid.New().String(),
-		messages: ch,
+		messages: make(chan []byte, srv.subscriberMessageBuffer),
 		closeSlow: func() {
 			c.Close(websocket.StatusPolicyViolation, "Connection couldn't keep up; too slow")
 		},
@@ -131,7 +130,7 @@ func (srv *websocketServer) subscribe(ctx context.Context, c *websocket.Conn, us
 	for {
 		select {
 		case msg := <-s.messages:
-			err := writeTimeout(ctx, time.Second*5, c, []byte(msg.Payload))
+			err := writeTimeout(ctx, time.Second*5, c, msg)
 			if err != nil {
 				return err
 			}
@@ -169,7 +168,7 @@ func (srv *websocketServer) addSubscriber(userID string, s *subscriber) {
 	defer srv.subscribersMu.Unlock()
 
 	subs := srv.subscribers[userID]
-	subs = append(subs, s)
+	srv.subscribers[userID] = append(subs, s)
 }
 
 func (srv *websocketServer) deleteSubscriber(userID string, subID string) {
