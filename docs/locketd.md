@@ -4,11 +4,11 @@
 
 ## API
 
-The Locket API's main endpoint is `/api/v2/locket`. It expects the config value for `locket.token` to be present in the `Authorization` header.
+The Locket API's main endpoint is `/api/v2/lockets`. It expects the config value for `locket.token` to be present in the `Authorization` header.
 
 ### Registering a Locket
 
-Lockets can be registered by making a `PUT` request to `/api/v2/locket`.
+Lockets can be registered by making a `PUT` request to `/api/v2/lockets`.
 
 #### Body
 
