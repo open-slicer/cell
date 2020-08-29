@@ -26,7 +26,7 @@ func newWebsocketServer() *websocketServer {
 	cs := &websocketServer{
 		subscriberMessageBuffer: 16,
 		subscribers:             make(map[string][]*subscriber),
-		publishLimiter:          rate.NewLimiter(rate.Every(time.Millisecond*100), 8),
+		publishLimiter:          rate.NewLimiter(rate.Every(time.Second/2), 10),
 	}
 	return cs
 }
