@@ -1,6 +1,6 @@
 # Config
 
-A simple file is what manages Cell's config. This should be named `config.extension`, where `extension` is essentially any common config file type (e.g. `config.yml`). If an extension isn't passed, [TOML](https://github.com/toml-lang/toml) will be used; however, YAML is used in this manual.
+A simple file is what manages Cell's config. This should be named `cell.extension`, where `extension` is essentially any common config file type (e.g. `config.yml`). If an extension isn't passed, YAML will be used.
 
 ## Example
 
