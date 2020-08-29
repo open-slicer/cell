@@ -9,7 +9,7 @@ environment: release # Enables verbose logging (debug or release)
 http:
   address: ':8080' # The address to bind on
 database:
-  mongodb: 'mongodb://localhost:27017' # The MongoDB instance's address
+  mongodb: 'mongodb://localhost:27017' # A MongoDB connection string
   redis:
     address: 'localhost:6379' # The Redis instance's address
     password: '' # The Redis password; leave empty if you haven't set one
