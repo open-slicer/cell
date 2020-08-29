@@ -48,7 +48,11 @@ func (locket *locketInterface) insert(ipAddr string) response {
 	}
 
 	err := rdb.HSet(
-		context.Background(), "lockets", ipAddr, fmt.Sprintf("%s:%d", locket.Host, locket.Port),
+		context.Background(),
+		"lockets",
+		map[string]interface{}{
+			ipAddr: fmt.Sprintf("%s:%d", locket.Host, locket.Port),
+		},
 	).Err()
 	if err != nil {
 		return internalError(err)
