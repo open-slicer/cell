@@ -29,8 +29,6 @@ func main() {
 		log.Fatal().Err(err).Msg("Couldn't read config")
 	}
 
-	locketToken = viper.GetString("locket.token")
-
 	if dsn := viper.GetString("sentry.dsn"); dsn != "" {
 		log.Debug().Err(err).Str("dsn", dsn).Msg("Initialising Sentry")
 		err := sentry.Init(sentry.ClientOptions{
