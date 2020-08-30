@@ -31,7 +31,7 @@ func TestUsers(t *testing.T) {
 		Value("data").Object().
 		Value("id").String().Raw()
 
-	token := e.POST("/api/v2/auth/login").WithJSON(userLogin{
+	token := "Bearer " + e.POST("/api/v2/auth/login").WithJSON(userLogin{
 		Username: username,
 		Password: password,
 	}).Expect().
@@ -39,7 +39,12 @@ func TestUsers(t *testing.T) {
 		JSON().Object().
 		Value("token").String().Raw()
 
-	e.GET("/api/v2/users/"+id).WithHeader("Authorization", "Bearer "+token).Expect().
+	token = "Bearer " + e.GET("/api/v2/auth/refresh").WithHeader("Authorization", token).Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		Value("token").String().Raw()
+
+	e.GET("/api/v2/users/"+id).WithHeader("Authorization", token).Expect().
 		Status(http.StatusOK).
 		JSON().Object().
 		Value("data").Object().
