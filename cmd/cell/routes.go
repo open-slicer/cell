@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func setupRoutes() {
+func setupRouter() {
 	// TODO: Make this stricter.
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},

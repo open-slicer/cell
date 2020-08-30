@@ -54,7 +54,7 @@ func main() {
 	}
 
 	gin.SetMode(environment)
-	setupRoutes()
+	setupRouter()
 
 	addr := viper.GetString("http.address")
 	if certFile := viper.GetString("security.cert_file"); certFile != "" {
