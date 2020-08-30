@@ -17,7 +17,7 @@ func dbConnect() {
 	pgURI := viper.GetString("database.postgres")
 	pg, err = pgx.Connect(context.Background(), pgURI)
 	if err != nil {
-		log.Fatal().Err(err).Str("uri", pgURI).Msg("Failed to connect to Redis")
+		log.Fatal().Err(err).Str("uri", pgURI).Msg("Failed to connect to postgres")
 	}
 
 	redisAddr := viper.GetString("database.redis.address")
