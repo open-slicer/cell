@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4"
 	"net/http"
-	"regexp"
 	"strings"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -14,8 +13,6 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
-
-var usernameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
 
 type user struct {
 	ID           string `json:"id"`
@@ -38,12 +35,12 @@ type userLogin struct {
 }
 
 func (req *userInsertion) insert() response {
-	if !usernameRegex.MatchString(req.Username) {
+	if !commonNameRegex.MatchString(req.Username) {
 		return response{
 			Code:    errorBindFailed,
 			Message: "Username didn't match the required regex",
 			HTTP:    http.StatusBadRequest,
-			Data:    usernameRegex.String(),
+			Data:    commonNameRegex.String(),
 		}
 	}
 

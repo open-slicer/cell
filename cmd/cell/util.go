@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/spf13/viper"
@@ -26,6 +27,8 @@ const (
 	errorDomainDidntMatch
 	errorParentNotExists
 )
+
+var commonNameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
 
 // response is a generic HTTP response. If HTTP is zeroed, Code should be used.
 type response struct {
