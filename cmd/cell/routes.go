@@ -56,6 +56,7 @@ func setupRouter() *gin.Engine {
 		{
 			channels.Use(authBlock)
 			channels.POST("", handleChannelsPOST)
+			channels.GET("/:id", handleChannelsGET)
 		}
 	}
 
