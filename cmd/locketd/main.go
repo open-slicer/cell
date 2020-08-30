@@ -3,11 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/JakeMakesStuff/structuredhttp"
-	"github.com/go-redis/redis/v8"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
 	"net"
 	"net/http"
 	"net/url"
@@ -15,6 +10,12 @@ import (
 	"os/signal"
 	"path"
 	"time"
+
+	"github.com/JakeMakesStuff/structuredhttp"
+	"github.com/go-redis/redis/v8"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 )
 
 var callTimeout = time.Second * 4
@@ -125,8 +126,7 @@ func redisConnect(address, password string, db int) (*redis.Client, error) {
 		Password: password,
 		DB:       db,
 	})
-	ctx, _ := context.WithTimeout(context.Background(), callTimeout)
-	_, err := client.Ping(ctx).Result()
+	_, err := client.Ping(context.Background()).Result()
 
 	return client, err
 }
