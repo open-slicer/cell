@@ -13,8 +13,6 @@ import (
 	"github.com/nbutton23/zxcvbn-go"
 	"github.com/rs/xid"
 	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -182,10 +180,10 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 
 			var userDoc user
 
-			if err := mng.users.FindOne(context.Background(), bson.M{
-				"username": req.Username,
-			}).Decode(&userDoc); err != nil {
-				if err != mongo.ErrNoDocuments {
+			if err := pg.QueryRow(
+				context.Background(), "SELECT (id, password_hash) FROM users WHERE username = $1", req.Username,
+			).Scan(&userDoc.ID, &userDoc.PasswordHash); err != nil {
+				if err != pgx.ErrNoRows {
 					captureException(err)
 				}
 				return nil, jwt.ErrFailedAuthentication
@@ -194,7 +192,6 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			if err := bcrypt.CompareHashAndPassword(userDoc.PasswordHash, []byte(req.Password)); err != nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
-
 			return userDoc, nil
 		},
 	})
