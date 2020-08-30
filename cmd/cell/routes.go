@@ -46,10 +46,10 @@ func setupRouter() *gin.Engine {
 			auth.GET("/refresh", authMiddleware.RefreshHandler)
 		}
 
-		locket := v2.Group("/lockets")
+		lockets := v2.Group("/lockets")
 		{
-			locket.GET("", authBlock, handleLocketGet)
-			locket.PUT("", configAuthMiddleware("locket.token"), handleLocketPut)
+			lockets.GET("", authBlock, handleLocketGet)
+			lockets.PUT("", configAuthMiddleware("locket.token"), handleLocketPut)
 		}
 	}
 
