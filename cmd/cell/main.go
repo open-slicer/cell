@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -60,4 +61,6 @@ func main() {
 	<-sigs
 
 	log.Info().Msg("Interrupt received, gracefully exiting")
+	_ = pg.Close(context.Background())
+	os.Exit(0)
 }
