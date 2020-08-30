@@ -23,7 +23,7 @@ func TestUsers(t *testing.T) {
 	id := e.POST("/api/v2/users").WithJSON(userInsertion{
 		Username:    username,
 		DisplayName: "Test User",
-		PublicKey:   []byte("..."),
+		PublicKey:   "...",
 		Password:    password,
 	}).Expect().
 		Status(http.StatusCreated).
