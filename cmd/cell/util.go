@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/spf13/viper"
 	"net/http"
 	"time"
+
+	"github.com/spf13/viper"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"

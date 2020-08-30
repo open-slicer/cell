@@ -4,15 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/rs/xid"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
-	"net/http"
 	"nhooyr.io/websocket"
-	"strings"
-	"sync"
-	"time"
 )
 
 type websocketServer struct {
