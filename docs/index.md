@@ -2,7 +2,8 @@
 
 Welcome to the Cell documentation. Currently, it's expected that Cell's API will change _a lot_; it's in early stages. This manual should act as developers' documentation for **API v2**, but also a reference for contributors to Cell.
 
-API v1 is deprecated and isn't available in Cell.
+!!! warning
+    API v1 (`/api/v1`) is deprecated and isn't available in Cell. This was part of the original Go implementation, but it has been rewritten.
 
 ## Main ideas
 
