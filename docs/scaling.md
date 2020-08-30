@@ -4,7 +4,7 @@ This covers how Cell scales. Most of this is Cell-specific and not related to th
 
 ## WebSocket
 
-Firstly, users GET `/api/ws` (excluding the version). This endpoint should redirect clients to a suitable WS server, where they'll be able to establish a connection. WS servers should check if the server permitted the action in the last minute before allowing them to connect.
+Firstly, users GET `/api/v2/lockets` (excluding the version). This endpoint should inform clients of a suitable WS server (Locket), where they'll be able to establish a connection. WS servers should check if the server permitted the action in the last minute before allowing them to connect.
 
 !!! note
     This is specific to Cell; it's not part of the Slicer specification.
