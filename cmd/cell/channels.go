@@ -136,6 +136,15 @@ type inviteInsertion struct {
 }
 
 func (req *inviteInsertion) insert(requesterID, channelID string) response {
+	if !commonNameRegex.MatchString(req.Name) {
+		return response{
+			Code:    errorNotCommonName,
+			Message: "Name didn't match the commonName regex",
+			HTTP:    http.StatusBadRequest,
+			Data:    commonNameRegex.String(),
+		}
+	}
+
 	if _, err := pg.Exec(
 		context.Background(), "SELECT 1 FROM invites WHERE name = $1", req.Name,
 	); err == nil {
