@@ -36,7 +36,7 @@ func setupRouter() *gin.Engine {
 
 		users := v2.Group("/users")
 		{
-			users.POST("/", handleUsersPost)
+			users.POST("", handleUsersPost)
 			users.GET("/:id", authBlock, handleUsersGet)
 		}
 
@@ -48,8 +48,8 @@ func setupRouter() *gin.Engine {
 
 		locket := v2.Group("/lockets")
 		{
-			locket.GET("/", authBlock, handleLocketGet)
-			locket.PUT("/", configAuthMiddleware("locket.token"), handleLocketPut)
+			locket.GET("", authBlock, handleLocketGet)
+			locket.PUT("", configAuthMiddleware("locket.token"), handleLocketPut)
 		}
 	}
 
