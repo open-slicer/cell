@@ -14,8 +14,11 @@ import (
 
 var idNode *snowflake.Node
 
+const epoch = 1577836800398
+
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	snowflake.Epoch = epoch
 
 	readConfig()
 	environment := viper.GetString("environment")
