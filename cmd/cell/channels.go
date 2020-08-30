@@ -180,3 +180,19 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 		Data:    i,
 	}
 }
+
+func handleInvitesPOST(c *gin.Context) {
+	invite := inviteInsertion{}
+	if err := c.ShouldBindJSON(&invite); err != nil {
+		response{
+			Code:    errorBindFailed,
+			Message: "Failed to bind JSON",
+			HTTP:    http.StatusBadRequest,
+			Data:    err.Error(),
+		}.send(c)
+		return
+	}
+
+	claims := jwt.ExtractClaims(c)
+	invite.insert(claims[identityKey].(string), c.Param("id")).send(c)
+}
