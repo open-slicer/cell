@@ -20,7 +20,7 @@ func TestUsers(t *testing.T) {
 
 	username := "test"
 	password := "_--fgsdLjhKf--_"
-	id := e.POST("/api/v2/users/").WithJSON(userInsertion{
+	id := e.POST("/api/v2/users").WithJSON(userInsertion{
 		Username:    username,
 		DisplayName: "Test User",
 		PublicKey:   []byte("..."),
@@ -39,7 +39,7 @@ func TestUsers(t *testing.T) {
 		JSON().Object().
 		Value("token").String().Raw()
 
-	e.GET("/api/v2/users/"+id+"/").WithHeader("Authorization", "Bearer "+token).Expect().
+	e.GET("/api/v2/users/"+id).WithHeader("Authorization", "Bearer "+token).Expect().
 		Status(http.StatusOK).
 		JSON().Object().
 		Value("data").Object().
