@@ -3,7 +3,7 @@ CREATE TABLE channels
     id     VARCHAR(20) PRIMARY KEY,
     name   VARCHAR(32) NOT NULL,
     owner  VARCHAR(20) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    parent VARCHAR(20) NOT NULL REFERENCES channels (id) ON DELETE CASCADE
+    parent VARCHAR(20) REFERENCES channels (id) ON DELETE CASCADE
 );
 
 CREATE TABLE invites
