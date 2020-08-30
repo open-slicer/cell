@@ -10,8 +10,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var r = gin.Default()
-
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
@@ -54,7 +52,7 @@ func main() {
 	}
 
 	gin.SetMode(environment)
-	setupRouter()
+	r := setupRouter()
 
 	addr := viper.GetString("http.address")
 	if certFile := viper.GetString("security.cert_file"); certFile != "" {

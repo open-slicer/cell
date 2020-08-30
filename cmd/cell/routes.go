@@ -8,7 +8,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func setupRouter() {
+func setupRouter() *gin.Engine {
+	r := gin.Default()
+
 	// TODO: Make this stricter.
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
@@ -50,4 +52,6 @@ func setupRouter() {
 			locket.PUT("/", configAuthMiddleware("locket.token"), handleLocketPut)
 		}
 	}
+
+	return r
 }
