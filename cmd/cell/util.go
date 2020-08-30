@@ -29,7 +29,7 @@ const (
 	errorNotCommonName
 )
 
-var commonNameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
+var commonNameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$")
 
 // response is a generic HTTP response. If HTTP is zeroed, Code should be used.
 type response struct {
