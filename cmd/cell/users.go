@@ -11,7 +11,6 @@ import (
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/nbutton23/zxcvbn-go"
-	"github.com/rs/xid"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -74,7 +73,7 @@ func (req *userInsertion) insert() response {
 	}
 
 	u := user{
-		ID:        xid.New().String(),
+		ID:        idNode.Generate().String(),
 		Username:  req.Username,
 		PublicKey: []byte(req.PublicKey),
 	}
