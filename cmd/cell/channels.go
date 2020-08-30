@@ -114,3 +114,10 @@ func (c *channel) get() response {
 		Data:    fChannel,
 	}
 }
+
+func handleChannelGET(c *gin.Context) {
+	channel := channel{
+		ID: c.Param("id"),
+	}
+	channel.get().send(c)
+}
