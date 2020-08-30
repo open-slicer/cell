@@ -19,11 +19,11 @@ import (
 var usernameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
 
 type user struct {
-	ID           string `json:"id" bson:"_id"`
-	Username     string `json:"username" bson:"username"`
-	DisplayName  string `json:"display_name,omitempty" bson:"display_name"`
-	PublicKey    []byte `json:"public_key" bson:"public_key"`
-	PasswordHash []byte `json:"-" bson:"password_hash"`
+	ID           string `json:"id"`
+	Username     string `json:"username"`
+	DisplayName  string `json:"display_name,omitempty"`
+	PublicKey    []byte `json:"public_key"`
+	PasswordHash []byte `json:"-"`
 }
 
 type userInsertion struct {
