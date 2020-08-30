@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/JakeMakesStuff/structuredhttp v0.0.0-20200614104234-f8e4b2aebe68
 	github.com/appleboy/gin-jwt/v2 v2.6.4
+	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/getsentry/sentry-go v0.7.0
