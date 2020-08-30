@@ -15,3 +15,30 @@ For example, to send a message you'd make a REST POST request to `/api/v2/channe
 PGP is used to encrypt messages. This must be done on the client; otherwise, it'd deprecate the entire reason this exists! The only thing Cell has to do about encryption is message validation and public key storage. On top of this, [bcrypt](https://en.wikipedia.org/wiki/Bcrypt) is used to hash passwords.
 
 This will be covered in more detail.
+
+## Responses
+
+The API (excluding Lockets and `/api/v2/auth`) will respond with this:
+
+```json
+{
+    "code": 0,
+    "message": "Pretty message (intended for humans, not computers)",
+    "data": anyType
+}
+```
+
+### Errors
+
+The `code` key of generic responses will be a HTTP status code on success, or an error code on error:
+
+```
+errorDomainDidntMatch 7
+errorDomainFailedLookup 6
+errorInvalidConfigToken 5
+errorNotFound 4
+errorBindFailed 3
+errorPasswordInsecure 2
+errorExists 1
+errorInternalError 0
+```
