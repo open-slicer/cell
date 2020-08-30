@@ -1,10 +1,11 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
 )
 
 func setupRoutes() {
@@ -45,7 +46,7 @@ func setupRoutes() {
 
 		locket := v2.Group("/lockets")
 		{
-			locket.GET("/", handleLocketGet)
+			locket.GET("/", authBlock, handleLocketGet)
 			locket.PUT("/", configAuthMiddleware("locket.token"), handleLocketPut)
 		}
 	}
