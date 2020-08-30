@@ -51,6 +51,12 @@ func setupRouter() *gin.Engine {
 			lockets.GET("", authBlock, handleLocketGet)
 			lockets.PUT("", configAuthMiddleware("locket.token"), handleLocketPut)
 		}
+
+		channels := v2.Group("/channels")
+		{
+			channels.Use(authBlock)
+			lockets.POST("", handleChannelsPOST)
+		}
 	}
 
 	return r
