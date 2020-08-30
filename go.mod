@@ -16,6 +16,7 @@ require (
 	github.com/rs/xid v1.2.1
 	github.com/rs/zerolog v1.19.0
 	github.com/spf13/viper v1.7.1
+	github.com/stretchr/testify v1.6.1
 	go.mongodb.org/mongo-driver v1.4.0
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/sys v0.0.0-20200828194041-157a740278f4 // indirect
