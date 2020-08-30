@@ -37,19 +37,7 @@ func main() {
 		}
 	}
 
-	mng = &mongoWrapper{
-		uri: viper.GetString("database.mongodb"),
-	}
-	if err := mng.connect(); err != nil {
-		log.Fatal().Err(err).Str("uri", mng.uri).Msg("Connecting to MongoDB")
-	}
-
-	redisAddr := viper.GetString("database.redis.address")
-	if rdb, err = redisConnect(
-		redisAddr, viper.GetString("database.redis.password"), viper.GetInt("database.redis.db"),
-	); err != nil {
-		log.Fatal().Err(err).Str("address", redisAddr).Msg("Failed to connect to Redis")
-	}
+	dbConnect()
 
 	gin.SetMode(environment)
 	r := setupRouter()

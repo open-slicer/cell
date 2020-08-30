@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/spf13/viper"
 
 	"github.com/go-redis/redis/v8"
 
@@ -51,4 +52,22 @@ func redisConnect(address, password string, db int) (*redis.Client, error) {
 	_, err := client.Ping(context.Background()).Result()
 
 	return client, err
+}
+
+func dbConnect() {
+	var err error
+
+	mng = &mongoWrapper{
+		uri: viper.GetString("database.mongodb"),
+	}
+	if err := mng.connect(); err != nil {
+		log.Fatal().Err(err).Str("uri", mng.uri).Msg("Connecting to MongoDB")
+	}
+
+	redisAddr := viper.GetString("database.redis.address")
+	if rdb, err = redisConnect(
+		redisAddr, viper.GetString("database.redis.password"), viper.GetInt("database.redis.db"),
+	); err != nil {
+		log.Fatal().Err(err).Str("address", redisAddr).Msg("Failed to connect to Redis")
+	}
 }
