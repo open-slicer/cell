@@ -65,7 +65,7 @@ func (req *channelInsertion) insert(requesterID string) response {
 	}
 }
 
-func handleChannelPOST(c *gin.Context) {
+func handleChannelsPOST(c *gin.Context) {
 	channel := channelInsertion{}
 	if err := c.ShouldBindJSON(&channel); err != nil {
 		response{
