@@ -145,17 +145,20 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 		}
 	}
 
-	if _, err := pg.Exec(
-		context.Background(), "SELECT 1 FROM invites WHERE name = $1", req.Name,
-	); err == nil {
+	var alreadyExists bool
+	if err := pg.QueryRow(
+		context.Background(), "SELECT EXISTS(SELECT 1 FROM invites WHERE name = $1)", req.Name,
+	).Scan(&alreadyExists); err != nil {
+		return internalError(err)
+	}
+	if alreadyExists {
 		return response{
 			Code:    errorExists,
 			Message: "An invite with the given name already exists",
 			HTTP:    http.StatusConflict,
 		}
-	} else if err != pgx.ErrNoRows {
-		return internalError(err)
 	}
+
 	if _, err := pg.Exec(
 		context.Background(), "SELECT 1 FROM channels WHERE id = $1", channelID,
 	); err != nil {
