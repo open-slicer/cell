@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
 	"net/http"
 )
@@ -61,4 +63,20 @@ func (req *channelInsertion) insert(requesterID string) response {
 		Message: "Channel created and member created for owner",
 		Data:    c,
 	}
+}
+
+func handleChannelPOST(c *gin.Context) {
+	channel := channelInsertion{}
+	if err := c.ShouldBindJSON(&channel); err != nil {
+		response{
+			Code:    errorBindFailed,
+			Message: "Failed to bind JSON",
+			HTTP:    http.StatusBadRequest,
+			Data:    err.Error(),
+		}.send(c)
+		return
+	}
+
+	claims := jwt.ExtractClaims(c)
+	channel.insert(claims[identityKey].(string)).send(c)
 }
