@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bwmarrin/snowflake"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
@@ -24,12 +23,11 @@ type websocketServer struct {
 }
 
 func newWebsocketServer() *websocketServer {
-	cs := &websocketServer{
+	return &websocketServer{
 		subscriberMessageBuffer: 16,
 		subscribers:             make(map[string][]*subscriber),
 		publishLimiter:          rate.NewLimiter(rate.Every(time.Second/2), 10),
 	}
-	return cs
 }
 
 type subscriber struct {
