@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/bwmarrin/snowflake"
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -11,6 +12,8 @@ import (
 	"os/signal"
 )
 
+var idNode *snowflake.Node
+
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
@@ -19,6 +22,13 @@ func main() {
 	if environment != "release" {
 		log.Logger = log.Level(zerolog.TraceLevel)
 		log.Info().Msg("Environment isn't 'release'; using trace level")
+	}
+
+	var err error
+	nodeID := viper.GetInt64("node")
+	idNode, err = snowflake.NewNode(nodeID)
+	if err != nil {
+		log.Fatal().Err(err).Int64("node_id", nodeID).Msg("Couldn't create id generator node")
 	}
 
 	if dsn := viper.GetString("sentry.dsn"); dsn != "" {
