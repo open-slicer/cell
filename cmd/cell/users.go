@@ -123,7 +123,7 @@ func (u *user) get() response {
 	var fUser user
 
 	if err := pg.QueryRow(
-		context.Background(), "SELECT (id, username, display_name, public_key) FROM users WHERE id = $1", u.ID,
+		context.Background(), "SELECT id, username, display_name, public_key FROM users WHERE id = $1", u.ID,
 	).Scan(&fUser.ID, &fUser.Username, &fUser.DisplayName, &fUser.PublicKey); err != nil {
 		if err != pgx.ErrNoRows {
 			return internalError(err)
@@ -181,7 +181,7 @@ func getAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			var userDoc user
 
 			if err := pg.QueryRow(
-				context.Background(), "SELECT (id, password_hash) FROM users WHERE username = $1", req.Username,
+				context.Background(), "SELECT id, password_hash FROM users WHERE username = $1", req.Username,
 			).Scan(&userDoc.ID, &userDoc.PasswordHash); err != nil {
 				if err != pgx.ErrNoRows {
 					captureException(err)
