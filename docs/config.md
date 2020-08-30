@@ -5,6 +5,7 @@ A simple file is what manages Cell's config. This should be named `cell.extensio
 ## Example
 
 ```yaml
+# cell.yml
 environment: release # Enables verbose logging (debug or release)
 http:
   address: ':8080' # The address to bind on
