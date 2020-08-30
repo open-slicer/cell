@@ -21,7 +21,7 @@ var usernameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
 type user struct {
 	ID           string `json:"id" bson:"_id"`
 	Username     string `json:"username" bson:"username"`
-	DisplayName  string `json:"display_name" bson:"display_name"`
+	DisplayName  string `json:"display_name,omitempty" bson:"display_name"`
 	PublicKey    []byte `json:"public_key" bson:"public_key"`
 	PasswordHash []byte `json:"-" bson:"password_hash"`
 }
@@ -78,9 +78,7 @@ func (req *userInsertion) insert() response {
 		Username:  req.Username,
 		PublicKey: []byte(req.PublicKey),
 	}
-	if u.DisplayName == "" {
-		u.DisplayName = u.Username
-	} else {
+	if u.DisplayName != "" {
 		u.DisplayName = strings.TrimSpace(u.DisplayName)
 	}
 
