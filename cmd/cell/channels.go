@@ -21,6 +21,7 @@ type channelInsertion struct {
 }
 
 func (req *channelInsertion) insert(requesterID string) response {
+	origin := false
 	if req.Parent != "" {
 		if _, err := pg.Exec(
 			context.Background(), "SELECT 1 FROM channels WHERE id = $1", req.Parent,
@@ -35,7 +36,7 @@ func (req *channelInsertion) insert(requesterID string) response {
 			}
 		}
 	} else {
-		req.Parent = "origin"
+		origin = true
 	}
 
 	c := channel{
@@ -45,13 +46,24 @@ func (req *channelInsertion) insert(requesterID string) response {
 		Parent: req.Parent,
 	}
 
-	if _, err := pg.Exec(
-		context.Background(),
-		"INSERT INTO channels (id, name, owner, parent) VALUES ($1, $2, $3, $4)",
-		c.ID, c.Name, c.Owner, c.Parent,
-	); err != nil {
+	var err error
+	if origin {
+		_, err = pg.Exec(
+			context.Background(),
+			"INSERT INTO channels (id, name, owner, parent) VALUES ($1, $2, $3, $4)",
+			c.ID, c.Name, c.Owner, c.Parent,
+		)
+	} else {
+		_, err = pg.Exec(
+			context.Background(),
+			"INSERT INTO channels (id, name, owner) VALUES ($1, $2, $3)",
+			c.ID, c.Name, c.Owner,
+		)
+	}
+	if err != nil {
 		return internalError(err)
 	}
+
 	if _, err := pg.Exec(
 		context.Background(), "INSERT INTO members (id, channel) VALUES ($1, $2)", c.Owner, c.ID,
 	); err != nil {
