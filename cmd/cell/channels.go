@@ -65,7 +65,9 @@ func (req *channelInsertion) insert(requesterID string) response {
 	}
 
 	if _, err := pg.Exec(
-		context.Background(), "INSERT INTO members (id, channel) VALUES ($1, $2)", c.Owner, c.ID,
+		context.Background(),
+		"INSERT INTO members (id, \"user\", channel) VALUES ($1, $2, $3)",
+		idNode.Generate().String(), c.Owner, c.ID,
 	); err != nil {
 		return internalError(err)
 	}
