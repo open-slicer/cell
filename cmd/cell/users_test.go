@@ -2,24 +2,24 @@ package main
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 	"testing"
+)
+
+const (
+	username = "test"
+	password = "_--fgsdLjhKf--_"
 )
 
 func TestUsers(t *testing.T) {
 	e := getExpect(t)
 
 	// Delete the user if it already exists. This is to avoid a conflict status code.
-	_, err := mng.users.DeleteOne(context.Background(), bson.M{
-		"username": "test",
-	})
+	_, err := pg.Exec(context.Background(), "DELETE FROM users WHERE username = $1", username)
 	if err != nil {
 		t.Fatalf("%e", err)
 	}
 
-	username := "test"
-	password := "_--fgsdLjhKf--_"
 	id := e.POST("/api/v2/users").WithJSON(userInsertion{
 		Username:    username,
 		DisplayName: "Test User",
