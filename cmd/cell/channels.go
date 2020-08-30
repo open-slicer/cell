@@ -50,14 +50,14 @@ func (req *channelInsertion) insert(requesterID string) response {
 	if origin {
 		_, err = pg.Exec(
 			context.Background(),
-			"INSERT INTO channels (id, name, owner, parent) VALUES ($1, $2, $3, $4)",
-			c.ID, c.Name, c.Owner, c.Parent,
+			"INSERT INTO channels (id, name, owner) VALUES ($1, $2, $3)",
+			c.ID, c.Name, c.Owner,
 		)
 	} else {
 		_, err = pg.Exec(
 			context.Background(),
-			"INSERT INTO channels (id, name, owner) VALUES ($1, $2, $3)",
-			c.ID, c.Name, c.Owner,
+			"INSERT INTO channels (id, name, owner, parent) VALUES ($1, $2, $3, $4)",
+			c.ID, c.Name, c.Owner, c.Parent,
 		)
 	}
 	if err != nil {
