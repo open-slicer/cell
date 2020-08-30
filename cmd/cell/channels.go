@@ -92,3 +92,25 @@ func handleChannelsPOST(c *gin.Context) {
 	claims := jwt.ExtractClaims(c)
 	channel.insert(claims[identityKey].(string)).send(c)
 }
+
+func (c *channel) get() response {
+	var fChannel channel
+	if err := pg.QueryRow(
+		context.Background(), "SELECT id, name, owner, parent FROM channels WHERE id = $1", c.ID,
+	).Scan(&fChannel.ID, &fChannel.Name, &fChannel.Owner, &fChannel.Parent); err != nil {
+		if err != pgx.ErrNoRows {
+			return internalError(err)
+		}
+		return response{
+			Code:    errorNotFound,
+			Message: "Channel doesn't exist",
+			HTTP:    http.StatusNotFound,
+		}
+	}
+
+	return response{
+		Code:    http.StatusOK,
+		Message: "Channel found",
+		Data:    fChannel,
+	}
+}
