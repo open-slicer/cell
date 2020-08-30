@@ -29,7 +29,7 @@ type user struct {
 type userInsertion struct {
 	Username    string `json:"username" binding:"required,gte=1,lte=32"`
 	DisplayName string `json:"display_name" binding:"lte=32"`
-	PublicKey   []byte `json:"public_key" binding:"required"`
+	PublicKey   string `json:"public_key" binding:"required"`
 	Password    string `json:"password" binding:"required,gte=1,lte=72"`
 }
 
@@ -76,7 +76,7 @@ func (req *userInsertion) insert() response {
 	u := user{
 		ID:        xid.New().String(),
 		Username:  req.Username,
-		PublicKey: req.PublicKey,
+		PublicKey: []byte(req.PublicKey),
 	}
 	if u.DisplayName == "" {
 		u.DisplayName = u.Username
