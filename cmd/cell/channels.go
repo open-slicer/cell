@@ -12,7 +12,7 @@ type channel struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`
 	Owner  string `json:"owner"`
-	Parent string `json:"parent"`
+	Parent string `json:"parent,omitempty"`
 }
 
 type channelInsertion struct {
