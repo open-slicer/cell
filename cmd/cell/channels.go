@@ -123,3 +123,60 @@ func handleChannelsGET(c *gin.Context) {
 	}
 	channel.get().send(c)
 }
+
+type invite struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Channel string `json:"channel"`
+	Owner   string `json:"owner"`
+}
+
+type inviteInsertion struct {
+	Name string `json:"name" binding:"required,gte=4,lte=32"`
+}
+
+func (req *inviteInsertion) insert(requesterID, channelID string) response {
+	if _, err := pg.Exec(
+		context.Background(), "SELECT 1 FROM invites WHERE name = $1", req.Name,
+	); err == nil {
+		return response{
+			Code:    errorExists,
+			Message: "An invite with the given name already exists",
+			HTTP:    http.StatusConflict,
+		}
+	} else if err != pgx.ErrNoRows {
+		return internalError(err)
+	}
+	if _, err := pg.Exec(
+		context.Background(), "SELECT 1 FROM channels WHERE id = $1", channelID,
+	); err != nil {
+		if err != pgx.ErrNoRows {
+			return internalError(err)
+		}
+		return response{
+			Code:    errorNotFound,
+			Message: "A channel with the provided ID doesn't exist",
+			HTTP:    http.StatusBadRequest,
+		}
+	}
+
+	i := invite{
+		ID:      idNode.Generate().String(),
+		Name:    req.Name,
+		Channel: channelID,
+		Owner:   requesterID,
+	}
+	if _, err := pg.Exec(
+		context.Background(),
+		"INSERT INTO invites (id, name, channel, owner) VALUES ($1, $2, $3, $4)",
+		i.ID, i.Name, i.Channel, i.Owner,
+	); err != nil {
+		return internalError(err)
+	}
+
+	return response{
+		Code:    http.StatusCreated,
+		Message: "Invite created",
+		Data:    i,
+	}
+}
