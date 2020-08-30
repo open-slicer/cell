@@ -41,33 +41,17 @@ func (d *mongoWrapper) connect() error {
 	return nil
 }
 
-func redisConnect(address, password string, db int) (*redis.Client, error) {
-	log.Debug().Str("address", address).Msg("Connecting to Redis")
-
-	client := redis.NewClient(&redis.Options{
-		Addr:     address,
-		Password: password,
-		DB:       db,
-	})
-	_, err := client.Ping(context.Background()).Result()
-
-	return client, err
-}
-
 func dbConnect() {
-	var err error
-
-	mng = &mongoWrapper{
-		uri: viper.GetString("database.mongodb"),
-	}
-	if err := mng.connect(); err != nil {
-		log.Fatal().Err(err).Str("uri", mng.uri).Msg("Connecting to MongoDB")
-	}
-
 	redisAddr := viper.GetString("database.redis.address")
-	if rdb, err = redisConnect(
-		redisAddr, viper.GetString("database.redis.password"), viper.GetInt("database.redis.db"),
-	); err != nil {
+	log.Debug().Str("address", redisAddr).Msg("Connecting to Redis")
+	client := redis.NewClient(&redis.Options{
+		Addr:     redisAddr,
+		Password: viper.GetString("database.redis.password"),
+		DB:       viper.GetInt("database.redis.db"),
+	})
+
+	_, err := client.Ping(context.Background()).Result()
+	if err != nil {
 		log.Fatal().Err(err).Str("address", redisAddr).Msg("Failed to connect to Redis")
 	}
 }
