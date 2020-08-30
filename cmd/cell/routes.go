@@ -21,7 +21,7 @@ func setupRouter() *gin.Engine {
 	}))
 
 	r.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "https://owo.gg/slicer/cell/-/wikis")
+		c.Redirect(http.StatusMovedPermanently, "http://slicer.softwares.software/cell")
 	})
 
 	v2 := r.Group("/api/v2")
