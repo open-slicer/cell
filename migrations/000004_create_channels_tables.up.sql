@@ -17,11 +17,12 @@ CREATE INDEX ON invites (name, channel);
 
 CREATE TABLE members
 (
-    id          VARCHAR(20) PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
+    id          VARCHAR(20) PRIMARY KEY,
+    "user"      VARCHAR(20) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     channel     VARCHAR(20) NOT NULL REFERENCES channels (id) ON DELETE CASCADE,
     permissions BIGINT
 );
-CREATE INDEX ON members (channel);
+CREATE INDEX ON members ("user", channel);
 
 CREATE TABLE messages
 (
