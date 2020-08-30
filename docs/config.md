@@ -1,6 +1,6 @@
 # Config
 
-A simple file is what manages Cell's config. This should be named `cell.extension`, where `extension` is essentially any common config file type (e.g. `config.yml`). If an extension isn't passed, YAML will be used.
+A simple file is what manages Cell's config. This should be named `cell.extension`, where `extension` is essentially any common config file type (e.g. `cell.yml`). If an extension isn't passed, YAML will be used.
 
 ## Example
 
