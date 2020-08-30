@@ -23,16 +23,17 @@ type channelInsertion struct {
 func (req *channelInsertion) insert(requesterID string) response {
 	origin := false
 	if req.Parent != "" {
-		if _, err := pg.Exec(
-			context.Background(), "SELECT 1 FROM channels WHERE id = $1", req.Parent,
-		); err != nil {
-			if err != pgx.ErrNoRows {
-				return internalError(err)
-			}
+		var exists bool
+		if err := pg.QueryRow(
+			context.Background(), "SELECT EXISTS(SELECT 1 FROM channels WHERE id = $1)", req.Parent,
+		).Scan(&exists); err != nil {
+			return internalError(err)
+		}
+		if !exists {
 			return response{
 				Code:    errorParentNotExists,
-				Message: "A parent channel with the provided ID doesn't exist",
-				HTTP:    http.StatusBadRequest,
+				Message: "A parent channel with the given ID doesn't exist",
+				HTTP:    http.StatusConflict,
 			}
 		}
 	} else {
@@ -145,13 +146,13 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 		}
 	}
 
-	var alreadyExists bool
+	var exists bool
 	if err := pg.QueryRow(
 		context.Background(), "SELECT EXISTS(SELECT 1 FROM invites WHERE name = $1)", req.Name,
-	).Scan(&alreadyExists); err != nil {
+	).Scan(&exists); err != nil {
 		return internalError(err)
 	}
-	if alreadyExists {
+	if exists {
 		return response{
 			Code:    errorExists,
 			Message: "An invite with the given name already exists",
@@ -159,16 +160,16 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 		}
 	}
 
-	if _, err := pg.Exec(
-		context.Background(), "SELECT 1 FROM channels WHERE id = $1", channelID,
-	); err != nil {
-		if err != pgx.ErrNoRows {
-			return internalError(err)
-		}
+	if err := pg.QueryRow(
+		context.Background(), "SELECT EXISTS(SELECT 1 FROM channels WHERE id = $1)", channelID,
+	).Scan(&exists); err != nil {
+		return internalError(err)
+	}
+	if !exists {
 		return response{
 			Code:    errorNotFound,
-			Message: "A channel with the provided ID doesn't exist",
-			HTTP:    http.StatusBadRequest,
+			Message: "A channel with the given ID doesn't exist",
+			HTTP:    http.StatusNotFound,
 		}
 	}
 
