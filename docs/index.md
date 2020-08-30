@@ -8,7 +8,7 @@ API v1 is deprecated and isn't available in Cell.
 
 The REST API exposes everything outgoing that doesn't require a persistent connection. This allows clients without the ability to hold long-running connections to use Cell. Contrary to this, [WebSocket](https://en.wikipedia.org/wiki/WebSocket) is used for incoming data (e.g. events); this is what allows realtime communication.
 
-For example, to send a message you'd make a REST POST request to `/api/v2/channels/:id/messages`. This is then able to be received by GETting `/api/v2/lockets`, using the link in the response and waiting for an `EVT_MESSAGE_CREATE` event. The payload will also contain the message body, so making another request to get it shouldn't be a requirement.
+For example, to send a message you'd make a REST POST request to `/api/v2/channels/:id/messages`. This is then able to be received by GETting `/api/v2/lockets`, using the link in the response and waiting for a message create event. The payload will also contain the message body, so making another request to get it shouldn't be a requirement.
 
 ## Encryption
 
