@@ -24,6 +24,7 @@ const (
 	errorInvalidConfigToken
 	errorDomainFailedLookup
 	errorDomainDidntMatch
+	errorParentNotExists
 )
 
 // response is a generic HTTP response. If HTTP is zeroed, Code should be used.
