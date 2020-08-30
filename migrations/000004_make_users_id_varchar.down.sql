@@ -1,0 +1,2 @@
+ALTER TABLE users
+    ALTER COLUMN id TYPE CHAR(20);
