@@ -32,7 +32,7 @@ The API (excluding Lockets and `/api/v2/auth`) will respond with this:
 
 The `code` key of generic responses will be a HTTP status code on success, or an error code on error:
 
-```
+```text
 errorDomainDidntMatch 7
 errorDomainFailedLookup 6
 errorInvalidConfigToken 5
