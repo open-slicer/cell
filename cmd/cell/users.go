@@ -74,7 +74,11 @@ func (req *userInsertion) insert() response {
 		return internalError(err)
 	}
 
-	u := user{ID: xid.New().String()}
+	u := user{
+		ID:        xid.New().String(),
+		Username:  req.Username,
+		PublicKey: req.PublicKey,
+	}
 	if u.DisplayName == "" {
 		u.DisplayName = u.Username
 	} else {
