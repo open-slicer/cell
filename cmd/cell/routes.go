@@ -58,7 +58,7 @@ func setupRouter() *gin.Engine {
 			channels.POST("", handleChannelsPOST)
 			channels.GET("/:id", handleChannelsGET)
 
-			invites := channels.Group("/invites")
+			invites := channels.Group("/:id/invites")
 			{
 				invites.POST("", handleInvitesPOST)
 			}
