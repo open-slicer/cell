@@ -55,7 +55,7 @@ func setupRouter() *gin.Engine {
 		channels := v2.Group("/channels")
 		{
 			channels.Use(authBlock)
-			lockets.POST("", handleChannelsPOST)
+			channels.POST("", handleChannelsPOST)
 		}
 	}
 
