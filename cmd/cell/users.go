@@ -57,16 +57,13 @@ func (req *userInsertion) insert() response {
 		}
 	}
 
-	var fetchedID string
-
-	if err := pg.QueryRow(
-		context.Background(), "SELECT id FROM users WHERE username = $1", req.Username,
-	).Scan(&fetchedID); err == nil {
+	if _, err := pg.Exec(
+		context.Background(), "SELECT 1 FROM users WHERE username = $1", req.Username,
+	); err == nil {
 		return response{
 			Code:    errorExists,
 			Message: "A user with the given username already exists",
 			HTTP:    http.StatusConflict,
-			Data:    fetchedID,
 		}
 	} else if err != pgx.ErrNoRows {
 		return internalError(err)
