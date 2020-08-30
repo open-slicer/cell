@@ -20,3 +20,4 @@
 # Configs
 /cell.yml
 /locketd.yml
+/cmd/*/*.yml
