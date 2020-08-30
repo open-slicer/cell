@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/JakeMakesStuff/structuredhttp v0.0.0-20200614104234-f8e4b2aebe68
 	github.com/appleboy/gin-jwt/v2 v2.6.4
-	github.com/bwmarrin/snowflake v0.3.0 // indirect
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/getsentry/sentry-go v0.7.0
@@ -16,10 +16,8 @@ require (
 	github.com/jackc/pgx/v4 v4.8.1
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d
 	github.com/prometheus/client_golang v1.7.1
-	github.com/rs/xid v1.2.1
 	github.com/rs/zerolog v1.19.0
 	github.com/spf13/viper v1.7.1
-	go.mongodb.org/mongo-driver v1.4.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/sys v0.0.0-20200828194041-157a740278f4 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
