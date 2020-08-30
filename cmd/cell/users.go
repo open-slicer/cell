@@ -122,10 +122,12 @@ func handleUsersPost(c *gin.Context) {
 }
 
 func (u *user) get() response {
-	if err := mng.users.FindOne(context.Background(), bson.M{
-		"_id": u.ID,
-	}).Decode(u); err != nil {
-		if err != mongo.ErrNoDocuments {
+	var fUser user
+
+	if err := pg.QueryRow(
+		context.Background(), "SELECT (id, username, display_name, public_key) FROM users WHERE id = $1", u.ID,
+	).Scan(&fUser.ID, &fUser.Username, &fUser.DisplayName, &fUser.PublicKey); err != nil {
+		if err != pgx.ErrNoRows {
 			return internalError(err)
 		}
 		return response{
@@ -138,7 +140,7 @@ func (u *user) get() response {
 	return response{
 		Code:    http.StatusOK,
 		Message: "User found",
-		Data:    u,
+		Data:    fUser,
 	}
 }
 
