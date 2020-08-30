@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var tRouter *gin.Engine
+var r *gin.Engine
 
 func TestMain(m *testing.M) {
 	setup()
@@ -17,5 +17,5 @@ func TestMain(m *testing.M) {
 func setup() {
 	readConfig()
 	dbConnect()
-	tRouter = setupRouter()
+	r = setupRouter()
 }
