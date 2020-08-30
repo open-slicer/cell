@@ -25,7 +25,7 @@ The API (excluding Lockets and `/api/v2/auth`) will respond with this:
 {
     "code": 0,
     "message": "Pretty message (intended for humans, not computers)",
-    "data": anyType
+    "data": "any type"
 }
 ```
 
