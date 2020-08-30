@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v4"
 	"net/http"
 	"regexp"
 	"strings"
@@ -59,18 +60,18 @@ func (req *userInsertion) insert() response {
 		}
 	}
 
-	var fetchedUser user
+	var fetchedID string
 
-	if err := mng.users.FindOne(context.Background(), bson.M{
-		"username": req.Username,
-	}).Decode(&fetchedUser); err == nil {
+	if err := pg.QueryRow(
+		context.Background(), "SELECT id FROM users WHERE username = $1", req.Username,
+	).Scan(&fetchedID); err == nil {
 		return response{
 			Code:    errorExists,
-			Message: fmt.Sprintf("A user with the username %s already exists", req.Username),
+			Message: "A user with the given username already exists",
 			HTTP:    http.StatusConflict,
-			Data:    fetchedUser,
+			Data:    fetchedID,
 		}
-	} else if err != mongo.ErrNoDocuments {
+	} else if err != pgx.ErrNoRows {
 		return internalError(err)
 	}
 
@@ -91,7 +92,11 @@ func (req *userInsertion) insert() response {
 		return internalError(err)
 	}
 
-	if _, err := mng.users.InsertOne(context.Background(), u); err != nil {
+	if _, err := pg.Exec(
+		context.Background(),
+		"INSERT INTO users (id, username, display_name, password_hash, public_key) VALUES ($1, $2, $3, $4, $5)",
+		u.ID, u.Username, u.DisplayName, u.PasswordHash, u.PublicKey,
+	); err != nil {
 		return internalError(err)
 	}
 	return response{
