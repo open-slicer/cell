@@ -79,3 +79,13 @@ func configAuthMiddleware(configPath string) func(c *gin.Context) {
 		c.Next()
 	}
 }
+
+func readConfig() {
+	viper.SetConfigName("cell")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Couldn't read config")
+	}
+}

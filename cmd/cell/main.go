@@ -13,22 +13,15 @@ import (
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
+	readConfig()
 	environment := viper.GetString("environment")
 	if environment != "release" {
 		log.Logger = log.Level(zerolog.TraceLevel)
 		log.Info().Msg("Environment isn't 'release'; using trace level")
 	}
 
-	viper.SetConfigName("cell")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal().Err(err).Msg("Couldn't read config")
-	}
-
 	if dsn := viper.GetString("sentry.dsn"); dsn != "" {
-		log.Debug().Err(err).Str("dsn", dsn).Msg("Initialising Sentry")
+		log.Debug().Str("dsn", dsn).Msg("Initialising Sentry")
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn: dsn,
 		})
@@ -48,15 +41,13 @@ func main() {
 
 		// Let's assume key_file is present.
 		keyFile := viper.GetString("security.key_file")
-		err = r.RunTLS(addr, certFile, keyFile)
-		if err != nil {
+		if err := r.RunTLS(addr, certFile, keyFile); err != nil {
 			log.Fatal().Bool("tls", true).Str("addr", addr).Err(err).Msg("Failed to start HTTP server")
 		}
 	}
 
 	log.Info().Bool("tls", false).Str("addr", addr).Msg("Starting HTTP server")
-	err = r.Run(addr)
-	if err != nil {
+	if err := r.Run(addr); err != nil {
 		log.Fatal().Err(err).Msg("Starting HTTP server")
 	}
 }
