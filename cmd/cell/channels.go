@@ -209,3 +209,25 @@ func handleInvitesPOST(c *gin.Context) {
 	claims := jwt.ExtractClaims(c)
 	invite.insert(claims[identityKey].(string), c.Param("id")).send(c)
 }
+
+func (i *invite) get() response {
+	var fInvite invite
+	if err := pg.QueryRow(
+		context.Background(), "SELECT id, name, owner, channel FROM invites WHERE name = $1", i.Name,
+	).Scan(&fInvite.ID, &fInvite.Name, &fInvite.Owner, &fInvite.Channel); err != nil {
+		if err != pgx.ErrNoRows {
+			return internalError(err)
+		}
+		return response{
+			Code:    errorNotFound,
+			Message: "Invite doesn't exist",
+			HTTP:    http.StatusNotFound,
+		}
+	}
+
+	return response{
+		Code:    http.StatusOK,
+		Message: "Invite found",
+		Data:    fInvite,
+	}
+}
