@@ -231,3 +231,10 @@ func (i *invite) get() response {
 		Data:    fInvite,
 	}
 }
+
+func handleInvitesGET(c *gin.Context) {
+	invite := invite{
+		ID: c.Param("id"),
+	}
+	invite.get().send(c)
+}
