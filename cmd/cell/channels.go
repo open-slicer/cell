@@ -234,7 +234,7 @@ func (i *invite) get() response {
 
 func handleInvitesGET(c *gin.Context) {
 	invite := invite{
-		ID: c.Param("id"),
+		Name: c.Param("name"),
 	}
 	invite.get().send(c)
 }
