@@ -56,6 +56,7 @@ func setupRouter() *gin.Engine {
 		{
 			invites.Use(authBlock)
 			invites.GET("/:name", handleInvitesGET)
+			invites.GET("/:name/accept", handleInvitesAcceptGET)
 		}
 
 		channels := v2.Group("/channels")
