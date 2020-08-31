@@ -236,3 +236,17 @@ func handleInvitesGET(c *gin.Context) {
 	}
 	invite.get().send(c)
 }
+
+func (i *invite) accept() response {
+	return response{
+		Code:    http.StatusCreated,
+		Message: "Invite accepted, member created",
+	}
+}
+
+func handleInvitesAcceptGET(c *gin.Context) {
+	invite := invite{
+		Name: c.Param("name"),
+	}
+	invite.accept().send(c)
+}
