@@ -54,6 +54,7 @@ func setupRouter() *gin.Engine {
 
 		invites := v2.Group("/invites")
 		{
+			invites.Use(authBlock)
 			invites.GET("/:id", handleInvitesGET)
 		}
 
