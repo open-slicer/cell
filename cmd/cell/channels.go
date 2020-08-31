@@ -126,7 +126,6 @@ func handleChannelsGET(c *gin.Context) {
 }
 
 type invite struct {
-	ID      string `json:"id"`
 	Name    string `json:"name"`
 	Channel string `json:"channel"`
 	Owner   string `json:"owner"`
@@ -174,15 +173,14 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 	}
 
 	i := invite{
-		ID:      idNode.Generate().String(),
 		Name:    req.Name,
 		Channel: channelID,
 		Owner:   requesterID,
 	}
 	if _, err := pg.Exec(
 		context.Background(),
-		"INSERT INTO invites (id, name, channel, owner) VALUES ($1, $2, $3, $4)",
-		i.ID, i.Name, i.Channel, i.Owner,
+		"INSERT INTO invites (name, channel, owner) VALUES ($1, $2, $3)",
+		i.Name, i.Channel, i.Owner,
 	); err != nil {
 		return internalError(err)
 	}
@@ -213,8 +211,8 @@ func handleInvitesPOST(c *gin.Context) {
 func (i *invite) get() response {
 	var fInvite invite
 	if err := pg.QueryRow(
-		context.Background(), "SELECT id, name, owner, channel FROM invites WHERE name = $1", i.Name,
-	).Scan(&fInvite.ID, &fInvite.Name, &fInvite.Owner, &fInvite.Channel); err != nil {
+		context.Background(), "SELECT name, owner, channel FROM invites WHERE name = $1", i.Name,
+	).Scan(&fInvite.Name, &fInvite.Owner, &fInvite.Channel); err != nil {
 		if err != pgx.ErrNoRows {
 			return internalError(err)
 		}
