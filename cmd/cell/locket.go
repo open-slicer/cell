@@ -17,7 +17,7 @@ type locketInterface struct {
 	Host string `json:"host"`
 }
 
-type locketPutResponse struct {
+type locketPUTResponse struct {
 	Address  string          `json:"address"`
 	Password string          `json:"password"`
 	DB       int             `json:"db"`
@@ -67,7 +67,7 @@ func (locket *locketInterface) insert(ipAddr string) response {
 	return response{
 		Code:    http.StatusCreated,
 		Message: "Locket added, expected to be ready",
-		Data: locketPutResponse{
+		Data: locketPUTResponse{
 			Address:  viper.GetString("database.redis.address"),
 			Password: viper.GetString("database.redis.password"),
 			DB:       viper.GetInt("database.redis.db"),
@@ -76,7 +76,7 @@ func (locket *locketInterface) insert(ipAddr string) response {
 	}
 }
 
-func handleLocketPut(c *gin.Context) {
+func handleLocketsPUT(c *gin.Context) {
 	locket := locketInterface{}
 	if err := c.ShouldBindJSON(&locket); err != nil {
 		response{
@@ -123,7 +123,7 @@ func (locket *locketInterface) get() response {
 	}
 }
 
-func handleLocketGet(c *gin.Context) {
+func handleLocketsGET(c *gin.Context) {
 	locket := locketInterface{}
 	locket.get().send(c)
 }

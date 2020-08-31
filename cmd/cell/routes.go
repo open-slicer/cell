@@ -48,8 +48,8 @@ func setupRouter() *gin.Engine {
 
 		lockets := v2.Group("/lockets")
 		{
-			lockets.GET("", authBlock, handleLocketGet)
-			lockets.PUT("", configAuthMiddleware("locket.token"), handleLocketPut)
+			lockets.GET("", authBlock, handleLocketsGET)
+			lockets.PUT("", configAuthMiddleware("locket.token"), handleLocketsPUT)
 		}
 
 		invites := v2.Group("/invites")
