@@ -238,7 +238,45 @@ func handleInvitesGET(c *gin.Context) {
 	invite.get().send(c)
 }
 
-func (i *invite) accept() response {
+func (i *invite) accept(requesterID string) response {
+	var channelID string
+	if err := pg.QueryRow(
+		context.Background(), "SELECT channel FROM invites WHERE name = $1", i.Name,
+	).Scan(&channelID); err != nil {
+		if err != pgx.ErrNoRows {
+			return internalError(err)
+		}
+		return response{
+			Code:    errorNotFound,
+			Message: "Invite doesn't exist",
+			HTTP:    http.StatusNotFound,
+		}
+	}
+
+	var exists bool
+	if err := pg.QueryRow(
+		context.Background(),
+		"SELECT EXISTS(SELECT 1 FROM members WHERE user = $1 AND channel = $2)",
+		requesterID, channelID,
+	).Scan(&exists); err != nil {
+		return internalError(err)
+	}
+	if exists {
+		return response{
+			Code:    errorExists,
+			Message: "Invite already accepted",
+			HTTP:    http.StatusConflict,
+			Data:    channelID,
+		}
+	}
+
+	if _, err := pg.Exec(
+		context.Background(),
+		"INSERT INTO members (id, \"user\", channel) VALUES ($1, $2, $3)",
+		idNode.Generate().String(), requesterID, channelID,
+	); err != nil {
+		return internalError(err)
+	}
 	return response{
 		Code:    http.StatusCreated,
 		Message: "Invite accepted, member created",
@@ -249,5 +287,6 @@ func handleInvitesAcceptGET(c *gin.Context) {
 	invite := invite{
 		Name: c.Param("name"),
 	}
-	invite.accept().send(c)
+	claims := jwt.ExtractClaims(c)
+	invite.accept(claims[identityKey].(string)).send(c)
 }
