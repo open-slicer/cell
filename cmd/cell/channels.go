@@ -256,7 +256,7 @@ func (i *invite) accept(requesterID string) response {
 	var exists bool
 	if err := pg.QueryRow(
 		context.Background(),
-		"SELECT EXISTS(SELECT 1 FROM members WHERE user = $1 AND channel = $2)",
+		"SELECT EXISTS(SELECT 1 FROM members WHERE \"user\" = $1 AND channel = $2)",
 		requesterID, channelID,
 	).Scan(&exists); err != nil {
 		return internalError(err)
