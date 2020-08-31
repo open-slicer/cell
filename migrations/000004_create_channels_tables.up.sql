@@ -8,10 +8,9 @@ CREATE TABLE channels
 
 CREATE TABLE invites
 (
-    id      VARCHAR(20) PRIMARY KEY,
-    name    VARCHAR(32) UNIQUE NOT NULL,
-    channel VARCHAR(20)        NOT NULL REFERENCES channels (id) ON DELETE CASCADE,
-    owner   VARCHAR(20)        NOT NULL REFERENCES users (id) ON DELETE CASCADE
+    name    VARCHAR(32) PRIMARY KEY,
+    channel VARCHAR(20) NOT NULL REFERENCES channels (id) ON DELETE CASCADE,
+    owner   VARCHAR(20) NOT NULL REFERENCES users (id) ON DELETE CASCADE
 );
 CREATE INDEX ON invites (name, channel);
 
