@@ -52,6 +52,11 @@ func setupRouter() *gin.Engine {
 			lockets.PUT("", configAuthMiddleware("locket.token"), handleLocketPut)
 		}
 
+		invites := v2.Group("/invites")
+		{
+			invites.GET("/:id", handleInvitesGET)
+		}
+
 		channels := v2.Group("/channels")
 		{
 			channels.Use(authBlock)
