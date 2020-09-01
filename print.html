@@ -168,7 +168,7 @@
 <p>This documentation uses <a href="https://github.com/rust-lang/mdBook">mdBook</a>, maintained by the Rust team and licensed under the <a href="https://github.com/rust-lang/mdBook/blob/master/LICENSE">Mozilla Public License 2.0</a>. The documentation itself is licensed under <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>, the same as the Slicer spec.</p>
 <h1><a class="header" href="#configuration" id="configuration">Configuration</a></h1>
 <blockquote>
-<p>This assumes that you know <a href="https://github.com/toml-lang/toml">TOML</a>. It's easy, I promise!</p>
+<p>The configuration format Cell uses is <a href="https://github.com/toml-lang/toml">TOML</a>.</p>
 </blockquote>
 <p>Cell's config is managed through <code>Rocket.toml</code>. The app will search for this file upon initialisation. The <em>required</em> keys, as of now, are simply for the database:</p>
 <pre><code class="language-toml">[global.databases]
