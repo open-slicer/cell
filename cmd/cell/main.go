@@ -2,17 +2,23 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
+
 	"github.com/bwmarrin/snowflake"
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
+	"github.com/jackc/pgx/v4"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"os"
-	"os/signal"
 )
 
 var idNode *snowflake.Node
+
+var rdb *redis.Client
+var pg *pgx.Conn
 
 const epoch = 1577836800398
 
@@ -20,14 +26,20 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	snowflake.Epoch = epoch
 
-	readConfig()
+	viper.SetConfigName("cell")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Couldn't read config")
+	}
+
 	environment := viper.GetString("environment")
 	if environment != "release" {
 		log.Logger = log.Level(zerolog.TraceLevel)
 		log.Info().Msg("Environment isn't 'release'; using trace level")
 	}
 
-	var err error
 	nodeID := viper.GetInt64("node")
 	idNode, err = snowflake.NewNode(nodeID)
 	if err != nil {
@@ -44,8 +56,23 @@ func main() {
 		}
 	}
 
-	dbConnect()
+	pgURI := viper.GetString("database.postgres")
+	pg, err = pgx.Connect(context.Background(), pgURI)
+	if err != nil {
+		log.Fatal().Err(err).Str("uri", pgURI).Msg("Failed to connect to postgres")
+	}
 
+	redisAddr := viper.GetString("database.redis.address")
+	client := redis.NewClient(&redis.Options{
+		Addr:     redisAddr,
+		Password: viper.GetString("database.redis.password"),
+		DB:       viper.GetInt("database.redis.db"),
+	})
+
+	_, err = client.Ping(context.Background()).Result()
+	if err != nil {
+		log.Fatal().Err(err).Str("address", redisAddr).Msg("Failed to connect to Redis")
+	}
 	gin.SetMode(environment)
 	r := setupRouter()
 
