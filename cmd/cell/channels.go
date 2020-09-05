@@ -10,14 +10,14 @@ import (
 )
 
 type channel struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Owner  string `json:"owner"`
-	Parent string `json:"parent,omitempty"`
+	ID     string  `json:"id"`
+	Name   string  `json:"name"`
+	Owner  string  `json:"owner"`
+	Parent *string `json:"parent,omitempty"`
 }
 
 func (c *channel) insert() error {
-	if c.Parent == "" {
+	if *c.Parent == "" {
 		_, err := pg.Exec(
 			context.Background(),
 			"INSERT INTO channels (id, name, owner) VALUES ($1, $2, $3)",
@@ -127,7 +127,7 @@ func handleChannelsPOST(c *gin.Context) {
 	ch := channel{
 		Name:   req.Name,
 		Owner:  claims[identityKey].(string),
-		Parent: req.Parent,
+		Parent: &req.Parent,
 	}
 	if req.Parent != "" {
 		exists, err := ch.parentExists()
