@@ -16,6 +16,24 @@ type channel struct {
 	Parent string `json:"parent,omitempty"`
 }
 
+func (c *channel) insert() error {
+	if c.Parent == "" {
+		_, err := pg.Exec(
+			context.Background(),
+			"INSERT INTO channels (id, name, owner) VALUES ($1, $2, $3)",
+			c.ID, c.Name, c.Owner,
+		)
+		return err
+	}
+
+	_, err := pg.Exec(
+		context.Background(),
+		"INSERT INTO channels (id, name, owner, parent) VALUES ($1, $2, $3, $4)",
+		c.ID, c.Name, c.Owner, c.Parent,
+	)
+	return err
+}
+
 type channelInsertion struct {
 	Name   string `json:"name" binding:"required,gte=1,lte=32"`
 	Parent string `json:"parent" binding:"lte=20"`
