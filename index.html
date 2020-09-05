@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="sidebar-visible no-js rust">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -48,7 +48,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "coal" : "rust";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -74,7 +74,7 @@
             if (theme === null || theme === undefined) { theme = default_theme; }
             var html = document.querySelector('html');
             html.classList.remove('no-js')
-            html.classList.remove('light')
+            html.classList.remove('rust')
             html.classList.add(theme);
             html.classList.add('js');
         </script>
@@ -112,8 +112,8 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -130,6 +130,10 @@
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        <a href="https://github.com/open-slicer/cell" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
                         
                     </div>
@@ -160,14 +164,14 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
-<p>Welcome to the Cell documentation. Currently, it's expected that Cell's API will change <em>a lot</em>; it's in early stages. This manual should act as developers' documentation for <strong>API v2</strong>, but also a reference for contributors to Cell.</p>
+<p>Welcome to the Cell documentation. Currently, it’s expected that Cell’s API will change <em>a lot</em>; it’s in early stages. This manual should act as developers’ documentation for <strong>API v2</strong>, but also a reference for contributors to Cell.</p>
 <p>!!! warning
-API v1 (<code>/api/v1</code>) is deprecated and isn't available in Cell. This was part of the original Go implementation, but it has been rewritten.</p>
+API v1 (<code>/api/v1</code>) is deprecated and isn’t available in Cell. This was part of the original Go implementation, but it has been rewritten.</p>
 <h2><a class="header" href="#main-ideas" id="main-ideas">Main ideas</a></h2>
-<p>The REST API exposes everything outgoing that doesn't require a persistent connection. This allows clients without the ability to hold long-running connections to use Cell. Contrary to this, <a href="https://en.wikipedia.org/wiki/WebSocket">WebSocket</a> is used for incoming data (e.g. events); this is what allows realtime communication.</p>
-<p>For example, to send a message you'd make a REST POST request to <code>/api/v2/channels/:id/messages</code>. This is then able to be received by GETting <code>/api/v2/lockets</code>, using the link in the response and waiting for a message create event. The payload will also contain the message body, so making another request to get it shouldn't be a requirement.</p>
+<p>The REST API exposes everything outgoing that doesn’t require a persistent connection. This allows clients without the ability to hold long-running connections to use Cell. Contrary to this, <a href="https://en.wikipedia.org/wiki/WebSocket">WebSocket</a> is used for incoming data (e.g. events); this is what allows realtime communication.</p>
+<p>For example, to send a message you’d make a REST POST request to <code>/api/v2/channels/:id/messages</code>. This is then able to be received by GETting <code>/api/v2/lockets</code>, using the link in the response and waiting for a message create event. The payload will also contain the message body, so making another request to get it shouldn’t be a requirement.</p>
 <h2><a class="header" href="#encryption" id="encryption">Encryption</a></h2>
-<p>PGP is used to encrypt messages. This must be done on the client; otherwise, it'd deprecate the entire reason this exists! The only thing Cell has to do about encryption is message validation and public key storage. On top of this, <a href="https://en.wikipedia.org/wiki/Bcrypt">bcrypt</a> is used to hash passwords.</p>
+<p>PGP is used to encrypt messages. This must be done on the client; otherwise, it’d deprecate the entire reason this exists! The only thing Cell has to do about encryption is message validation and public key storage. On top of this, <a href="https://en.wikipedia.org/wiki/Bcrypt">bcrypt</a> is used to hash passwords.</p>
 <p>This will be covered in more detail.</p>
 <h2><a class="header" href="#responses" id="responses">Responses</a></h2>
 <p>The API (excluding Lockets and <code>/api/v2/auth</code>) will respond with this:</p>

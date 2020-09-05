@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="sidebar-visible no-js rust">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -48,7 +48,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "coal" : "rust";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -74,7 +74,7 @@
             if (theme === null || theme === undefined) { theme = default_theme; }
             var html = document.querySelector('html');
             html.classList.remove('no-js')
-            html.classList.remove('light')
+            html.classList.remove('rust')
             html.classList.add(theme);
             html.classList.add('js');
         </script>
@@ -112,8 +112,8 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -130,6 +130,10 @@
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        <a href="https://github.com/open-slicer/cell" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
                         
                     </div>
@@ -162,10 +166,10 @@
                         <h1><a class="header" href="#scaling" id="scaling">Scaling</a></h1>
 <p>This covers how Cell scales. Most of this is Cell-specific and not related to the Slicer specification.</p>
 <h2><a class="header" href="#websocket" id="websocket">WebSocket</a></h2>
-<p>Firstly, users GET <code>/api/v2/lockets</code> (excluding the version). This endpoint should inform clients of a suitable WS server (Locket), where they'll be able to establish a connection. WS servers should check if the server permitted the action in the last minute before allowing them to connect.</p>
+<p>Firstly, users GET <code>/api/v2/lockets</code> (excluding the version). This endpoint should inform clients of a suitable WS server (Locket), where they’ll be able to establish a connection. WS servers should check if the server permitted the action in the last minute before allowing them to connect.</p>
 <p>!!! note
-This is specific to Cell; it's not part of the Slicer specification.</p>
-<p>Cell runs separate processes for WebSocket connections. The main process dispatches data to be sent over WS with Redis's pub/sub system, keyed by the user ID. All processes handling connections for the user receive the request and send the message over to each client; you're of course able to have more than one concurrent connection to Cell.</p>
+This is specific to Cell; it’s not part of the Slicer specification.</p>
+<p>Cell runs separate processes for WebSocket connections. The main process dispatches data to be sent over WS with Redis’s pub/sub system, keyed by the user ID. All processes handling connections for the user receive the request and send the message over to each client; you’re of course able to have more than one concurrent connection to Cell.</p>
 <p>!!! warning
 This is unimplemented.</p>
 <p>On top of this, each client (connection) has a unique ID. This allows the server to send connection-specific packets.</p>

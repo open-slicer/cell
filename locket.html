@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="sidebar-visible no-js rust">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -48,7 +48,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "coal" : "rust";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -74,7 +74,7 @@
             if (theme === null || theme === undefined) { theme = default_theme; }
             var html = document.querySelector('html');
             html.classList.remove('no-js')
-            html.classList.remove('light')
+            html.classList.remove('rust')
             html.classList.add(theme);
             html.classList.add('js');
         </script>
@@ -112,8 +112,8 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -130,6 +130,10 @@
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        <a href="https://github.com/open-slicer/cell" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
                         
                     </div>
@@ -161,13 +165,13 @@
                     <main>
                         <h1><a class="header" href="#locket" id="locket">Locket</a></h1>
 <p>Locket is how Slicer clients can receive events and just partake in realtime web comms.</p>
-<p><code>locketd</code> is Cell's implementation. It allows Cell to be horizontally scalable, as instances can register with the main Cell server by making an authorised HTTP request. Redis is used to dispatch requests to <code>locketd</code>; read more in the <a href="scaling.html">scaling section</a>.</p>
+<p><code>locketd</code> is Cell’s implementation. It allows Cell to be horizontally scalable, as instances can register with the main Cell server by making an authorised HTTP request. Redis is used to dispatch requests to <code>locketd</code>; read more in the <a href="scaling.html">scaling section</a>.</p>
 <h2><a class="header" href="#api" id="api">API</a></h2>
-<p>The Locket API's main endpoint is <code>/api/v2/lockets</code>.</p>
+<p>The Locket API’s main endpoint is <code>/api/v2/lockets</code>.</p>
 <h3><a class="header" href="#getting-a-locket" id="getting-a-locket">Getting a Locket</a></h3>
 <p>As a client (not a server like <code>locketd</code>), you may request to be assigned a Locket. This is required for WebSocket operations. To do this, you can make a GET request to <code>/api/v2/lockets</code>. This requires a bearer token.</p>
 <h4><a class="header" href="#response" id="response">Response</a></h4>
-<p>You'll receive an application/json response body. The <code>data</code> will be a string representing the address at which you can access the Locket: <code>domainOrIP:port</code>.</p>
+<p>You’ll receive an application/json response body. The <code>data</code> will be a string representing the address at which you can access the Locket: <code>domainOrIP:port</code>.</p>
 <h3><a class="header" href="#registering-a-locket" id="registering-a-locket">Registering a Locket</a></h3>
 <p>Lockets can be registered by making a <code>PUT</code> request to <code>/api/v2/lockets</code>. This expects the config value for <code>locket.token</code> to be present in the <code>Authorization</code> header.</p>
 <h4><a class="header" href="#request" id="request">Request</a></h4>
@@ -181,9 +185,9 @@
 <p>Required. This is the TCP port that the Locket server is listening on.</p>
 <h5><a class="header" href="#host" id="host"><code>host</code></a></h5>
 <p>Defaults to the request IP. If provided, this should be a domain that points to the request IP.</p>
-<p>If there was an error looking up the domain, <code>errorDomainFailedLookup</code> will be thrown. If the lookup succeeded but the resulting IPs didn't include the request IP, <code>errorDomainDidntMatch</code> will be thrown.</p>
+<p>If there was an error looking up the domain, <code>errorDomainFailedLookup</code> will be thrown. If the lookup succeeded but the resulting IPs didn’t include the request IP, <code>errorDomainDidntMatch</code> will be thrown.</p>
 <h4><a class="header" href="#response-1" id="response-1">Response</a></h4>
-<p>You'll receive an application/json response. Its <code>data</code> will be a <code>locketInterface</code> object:</p>
+<p>You’ll receive an application/json response. Its <code>data</code> will be a <code>locketInterface</code> object:</p>
 <pre><code class="language-json">{
   &quot;port&quot;: 8080,
   &quot;host&quot;: &quot;some.optional.locket.com&quot;
@@ -191,7 +195,7 @@
 </code></pre>
 <h4><a class="header" href="#errors" id="errors">Errors</a></h4>
 <!-- TODO: number representations -->
-<p><code>errorDomainFailedLookup</code> and <code>errorDomainDidntMatch</code> are assigned to this endpoint. See the body section for when it'll be thrown.</p>
+<p><code>errorDomainFailedLookup</code> and <code>errorDomainDidntMatch</code> are assigned to this endpoint. See the body section for when it’ll be thrown.</p>
 
                     </main>
 
