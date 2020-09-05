@@ -40,7 +40,6 @@ type channelInsertion struct {
 }
 
 func (req *channelInsertion) insert(requesterID string) response {
-	origin := false
 	if req.Parent != "" {
 		var exists bool
 		if err := pg.QueryRow(
@@ -55,8 +54,6 @@ func (req *channelInsertion) insert(requesterID string) response {
 				HTTP:    http.StatusConflict,
 			}
 		}
-	} else {
-		origin = true
 	}
 
 	c := channel{
@@ -65,22 +62,7 @@ func (req *channelInsertion) insert(requesterID string) response {
 		Owner:  requesterID,
 		Parent: req.Parent,
 	}
-
-	var err error
-	if origin {
-		_, err = pg.Exec(
-			context.Background(),
-			"INSERT INTO channels (id, name, owner) VALUES ($1, $2, $3)",
-			c.ID, c.Name, c.Owner,
-		)
-	} else {
-		_, err = pg.Exec(
-			context.Background(),
-			"INSERT INTO channels (id, name, owner, parent) VALUES ($1, $2, $3, $4)",
-			c.ID, c.Name, c.Owner, c.Parent,
-		)
-	}
-	if err != nil {
+	if err := c.insert(); err != nil {
 		return internalError(err)
 	}
 
