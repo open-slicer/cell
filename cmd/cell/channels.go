@@ -174,6 +174,14 @@ func (i *invite) exists() (bool, error) {
 	return exists, err
 }
 
+func (i *invite) channelExists() (bool, error) {
+	var exists bool
+	err := pg.QueryRow(
+		context.Background(), "SELECT EXISTS(SELECT 1 FROM channels WHERE id = $1)", i.Channel,
+	).Scan(&exists)
+	return exists, err
+}
+
 type inviteInsertion struct {
 	Name string `json:"name" binding:"required,gte=4,lte=32"`
 }
@@ -188,10 +196,13 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 		}
 	}
 
-	var exists bool
-	if err := pg.QueryRow(
-		context.Background(), "SELECT EXISTS(SELECT 1 FROM invites WHERE name = $1)", req.Name,
-	).Scan(&exists); err != nil {
+	i := invite{
+		Name:    req.Name,
+		Channel: channelID,
+		Owner:   requesterID,
+	}
+	exists, err := i.exists()
+	if err != nil {
 		return internalError(err)
 	}
 	if exists {
@@ -202,12 +213,11 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 		}
 	}
 
-	if err := pg.QueryRow(
-		context.Background(), "SELECT EXISTS(SELECT 1 FROM channels WHERE id = $1)", channelID,
-	).Scan(&exists); err != nil {
+	channelExists, err := i.channelExists()
+	if err != nil {
 		return internalError(err)
 	}
-	if !exists {
+	if !channelExists {
 		return response{
 			Code:    errorNotFound,
 			Message: "A channel with the given ID doesn't exist",
@@ -215,15 +225,9 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 		}
 	}
 
-	i := invite{
-		Name:    req.Name,
-		Channel: channelID,
-		Owner:   requesterID,
-	}
 	if err := i.insert(); err != nil {
 		return internalError(err)
 	}
-
 	return response{
 		Code:    http.StatusCreated,
 		Message: "Invite created",
