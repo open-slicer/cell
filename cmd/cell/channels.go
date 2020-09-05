@@ -166,6 +166,14 @@ func (i *invite) insert() error {
 	return err
 }
 
+func (i *invite) exists() (bool, error) {
+	var exists bool
+	err := pg.QueryRow(
+		context.Background(), "SELECT EXISTS(SELECT 1 FROM invites WHERE name = $1)", i.Name,
+	).Scan(&exists)
+	return exists, err
+}
+
 type inviteInsertion struct {
 	Name string `json:"name" binding:"required,gte=4,lte=32"`
 }
