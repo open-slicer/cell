@@ -43,6 +43,7 @@ func (u *user) exists() (bool, error) {
 	return exists, nil
 }
 
+// userInsertion implements the request clients should send when registering.
 type userInsertion struct {
 	Username    string `json:"username" binding:"required,gte=1,lte=32"`
 	DisplayName string `json:"display_name" binding:"lte=32"`
@@ -50,11 +51,13 @@ type userInsertion struct {
 	Password    string `json:"password" binding:"required,gte=1,lte=72"`
 }
 
+// userLogin implements the request clients should send when logging in, assuming that they already have an account.
 type userLogin struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
+// handleUsersPost handles POST /api/v2/users. This registers a new user.
 func handleUsersPost(c *gin.Context) {
 	req := userInsertion{}
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -76,7 +79,6 @@ func handleUsersPost(c *gin.Context) {
 		}.send(c)
 		return
 	}
-
 	passStrength := zxcvbn.PasswordStrength(req.Password, []string{req.Username, req.DisplayName})
 	if passStrength.Score < 3 {
 		response{
@@ -93,10 +95,6 @@ func handleUsersPost(c *gin.Context) {
 		Username:  req.Username,
 		PublicKey: []byte(req.PublicKey),
 	}
-	if u.DisplayName != "" {
-		u.DisplayName = strings.TrimSpace(u.DisplayName)
-	}
-
 	alreadyExists, err := u.exists()
 	if err != nil {
 		internalError(err).send(c)
@@ -111,11 +109,15 @@ func handleUsersPost(c *gin.Context) {
 		return
 	}
 
+	if u.DisplayName != "" {
+		u.DisplayName = strings.TrimSpace(u.DisplayName)
+	}
 	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		internalError(err).send(c)
 		return
 	}
+
 	if err := u.insert(); err != nil {
 		internalError(err).send(c)
 		return
