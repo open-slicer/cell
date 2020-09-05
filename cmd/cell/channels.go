@@ -42,6 +42,12 @@ func (c *channel) parentExists() (bool, error) {
 	return exists, err
 }
 
+func (c *channel) get() error {
+	return pg.QueryRow(
+		context.Background(), "SELECT id, name, owner, parent FROM channels WHERE id = $1", c.ID,
+	).Scan(&c.ID, &c.Name, &c.Owner, &c.Parent)
+}
+
 type member struct {
 	ID          string `json:"id"`
 	User        string `json:"user"`
@@ -130,12 +136,6 @@ func handleChannelsPOST(c *gin.Context) {
 	}.send(c)
 }
 
-func (c *channel) get() error {
-	return pg.QueryRow(
-		context.Background(), "SELECT id, name, owner, parent FROM channels WHERE id = $1", c.ID,
-	).Scan(c.ID, c.Name, c.Owner, c.Parent)
-}
-
 func handleChannelsGET(c *gin.Context) {
 	ch := channel{
 		ID: c.Param("id"),
@@ -190,6 +190,12 @@ func (i *invite) channelExists() (bool, error) {
 		context.Background(), "SELECT EXISTS(SELECT 1 FROM channels WHERE id = $1)", i.Channel,
 	).Scan(&exists)
 	return exists, err
+}
+
+func (i *invite) get() error {
+	return pg.QueryRow(
+		context.Background(), "SELECT owner, channel FROM invites WHERE name = $1", i.Name,
+	).Scan(&i.Owner, &i.Channel)
 }
 
 type inviteInsertion struct {
@@ -260,12 +266,6 @@ func handleInvitesPOST(c *gin.Context) {
 		Message: "Invite created",
 		Data:    i,
 	}.send(c)
-}
-
-func (i *invite) get() error {
-	return pg.QueryRow(
-		context.Background(), "SELECT owner, channel FROM invites WHERE name = $1", i.Name,
-	).Scan(&i.Owner, &i.Channel)
 }
 
 func handleInvitesGET(c *gin.Context) {
