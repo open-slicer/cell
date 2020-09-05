@@ -58,6 +58,16 @@ func (m *member) insert() error {
 	return err
 }
 
+func (m *member) exists() (bool, error) {
+	var exists bool
+	err := pg.QueryRow(
+		context.Background(),
+		"SELECT EXISTS(SELECT 1 FROM members WHERE \"user\" = $1 AND channel = $2)",
+		m.User, m.Channel,
+	).Scan(&exists)
+	return exists, err
+}
+
 type channelInsertion struct {
 	Name   string `json:"name" binding:"required,gte=1,lte=32"`
 	Parent string `json:"parent" binding:"lte=20"`
@@ -294,12 +304,13 @@ func (i *invite) accept(requesterID string) response {
 		}
 	}
 
-	var exists bool
-	if err := pg.QueryRow(
-		context.Background(),
-		"SELECT EXISTS(SELECT 1 FROM members WHERE \"user\" = $1 AND channel = $2)",
-		requesterID, i.Channel,
-	).Scan(&exists); err != nil {
+	m := member{
+		User:    requesterID,
+		Channel: i.Channel,
+	}
+
+	exists, err := m.exists()
+	if err != nil {
 		return internalError(err)
 	}
 	if exists {
@@ -307,15 +318,11 @@ func (i *invite) accept(requesterID string) response {
 			Code:    errorExists,
 			Message: "Invite already accepted",
 			HTTP:    http.StatusConflict,
-			Data:    i.Channel,
+			Data:    m.Channel,
 		}
 	}
 
-	m := member{
-		ID:      idNode.Generate().String(),
-		User:    requesterID,
-		Channel: i.Channel,
-	}
+	m.ID = idNode.Generate().String()
 	if err := m.insert(); err != nil {
 		return internalError(err)
 	}
