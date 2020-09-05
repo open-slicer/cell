@@ -39,6 +39,9 @@ func (locket *locketInterface) getHostname() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if len(res) == 0 {
+		return "", nil
+	}
 
 	for _, hostname := range res {
 		if used, ok := previousLockets[hostname]; !ok || !used {
@@ -47,13 +50,15 @@ func (locket *locketInterface) getHostname() (string, error) {
 		}
 	}
 
-	// If we haven't returned yet, all lockets were used.
-	previousLockets = map[string]bool{}
-
 	var genesisLocket string
+	// This just gets *some* element from the slice. It isn't guaranteed to be random, but it's good enough.
 	for _, hostname := range res {
 		genesisLocket = hostname
 		break
+	}
+	// If we haven't returned yet, all lockets apart from the genesis were used.
+	previousLockets = map[string]bool{
+		genesisLocket: true,
 	}
 	return genesisLocket, nil
 }
@@ -124,6 +129,14 @@ func handleLocketsGET(c *gin.Context) {
 	hostname, err := locket.getHostname()
 	if err != nil {
 		internalError(err).send(c)
+		return
+	}
+	if hostname == "" {
+		response{
+			Code:    errorOutOfLockets,
+			Message: "No Lockets were available to be assigned",
+			HTTP:    http.StatusNotFound,
+		}.send(c)
 		return
 	}
 
