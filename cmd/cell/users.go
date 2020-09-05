@@ -25,7 +25,6 @@ type user struct {
 
 // insert inserts the user into the DB. This generates a unique identifier.
 func (u *user) insert() error {
-	u.ID = idNode.Generate().String()
 	_, err := pg.Exec(
 		context.Background(),
 		"INSERT INTO users (id, username, display_name, password_hash, public_key) VALUES ($1, $2, $3, $4, $5)",
@@ -123,6 +122,7 @@ func handleUsersPOST(c *gin.Context) {
 		u.DisplayName = strings.TrimSpace(u.DisplayName)
 	}
 	u.PublicKey = []byte(req.PublicKey)
+	u.ID = idNode.Generate().String()
 
 	if err := u.insert(); err != nil {
 		internalError(err).send(c)
