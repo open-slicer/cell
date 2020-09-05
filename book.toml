@@ -4,3 +4,9 @@ language = "en"
 multilingual = false
 src = "docs"
 title = "Cell Manual"
+
+[output.html]
+default-theme = "rust"
+preferred-dark-theme = "coal"
+curly-quotes = true
+git-repository-url = "https://github.com/open-slicer/cell"
