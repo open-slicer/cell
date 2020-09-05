@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -86,7 +85,7 @@ func handleUsersPost(c *gin.Context) {
 	if passStrength.Score < 3 {
 		response{
 			Code:    errorPasswordInsecure,
-			Message: fmt.Sprintf("Password is not secure under zxcvbn (got %d, want >=3)", passStrength.Score),
+			Message: "Password is not secure under zxcvbn (want >=3)",
 			HTTP:    http.StatusBadRequest,
 			Data:    passStrength,
 		}.send(c)
