@@ -93,7 +93,6 @@ func handleUsersPost(c *gin.Context) {
 	}
 
 	u := user{
-		ID:        idNode.Generate().String(),
 		Username:  req.Username,
 		PublicKey: []byte(req.PublicKey),
 	}
