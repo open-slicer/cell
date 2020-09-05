@@ -164,38 +164,6 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#locket" id="locket">Locket</a></h1>
-<p>Locket is how Slicer clients can receive events and just partake in realtime web comms.</p>
-<p><code>locketd</code> is Cell’s implementation. It allows Cell to be horizontally scalable, as instances can register with the main Cell server by making an authorised HTTP request. Redis is used to dispatch requests to <code>locketd</code>; read more in the <a href="scaling.html">scaling section</a>.</p>
-<h2><a class="header" href="#api" id="api">API</a></h2>
-<p>The Locket API’s main endpoint is <code>/api/v2/lockets</code>.</p>
-<h3><a class="header" href="#getting-a-locket" id="getting-a-locket">Getting a Locket</a></h3>
-<p>As a client (not a server like <code>locketd</code>), you may request to be assigned a Locket. This is required for WebSocket operations. To do this, you can make a GET request to <code>/api/v2/lockets</code>. This requires a bearer token.</p>
-<h4><a class="header" href="#response" id="response">Response</a></h4>
-<p>You’ll receive an application/json response body. The <code>data</code> will be a string representing the address at which you can access the Locket: <code>domainOrIP:port</code>.</p>
-<h3><a class="header" href="#registering-a-locket" id="registering-a-locket">Registering a Locket</a></h3>
-<p>Lockets can be registered by making a <code>PUT</code> request to <code>/api/v2/lockets</code>. This expects the config value for <code>locket.token</code> to be present in the <code>Authorization</code> header.</p>
-<h4><a class="header" href="#request" id="request">Request</a></h4>
-<p>It expects an application/json body:</p>
-<pre><code class="language-json">{
-  &quot;port&quot;: 8080,
-  &quot;host&quot;: &quot;some.locket.com&quot;
-}
-</code></pre>
-<h5><a class="header" href="#port" id="port"><code>port</code></a></h5>
-<p>Required. This is the TCP port that the Locket server is listening on.</p>
-<h5><a class="header" href="#host" id="host"><code>host</code></a></h5>
-<p>Defaults to the request IP. If provided, this should be a domain that points to the request IP.</p>
-<p>If there was an error looking up the domain, <code>errorDomainFailedLookup</code> will be thrown. If the lookup succeeded but the resulting IPs didn’t include the request IP, <code>errorDomainDidntMatch</code> will be thrown.</p>
-<h4><a class="header" href="#response-1" id="response-1">Response</a></h4>
-<p>You’ll receive an application/json response. Its <code>data</code> will be a <code>locketInterface</code> object:</p>
-<pre><code class="language-json">{
-  &quot;port&quot;: 8080,
-  &quot;host&quot;: &quot;some.optional.locket.com&quot;
-}
-</code></pre>
-<h4><a class="header" href="#errors" id="errors">Errors</a></h4>
-<!-- TODO: number representations -->
-<p><code>errorDomainFailedLookup</code> and <code>errorDomainDidntMatch</code> are assigned to this endpoint. See the body section for when it’ll be thrown.</p>
 
                     </main>
 
