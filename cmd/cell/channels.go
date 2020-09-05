@@ -157,6 +157,15 @@ type invite struct {
 	Owner   string `json:"owner"`
 }
 
+func (i *invite) insert() error {
+	_, err := pg.Exec(
+		context.Background(),
+		"INSERT INTO invites (name, channel, owner) VALUES ($1, $2, $3)",
+		i.Name, i.Channel, i.Owner,
+	)
+	return err
+}
+
 type inviteInsertion struct {
 	Name string `json:"name" binding:"required,gte=4,lte=32"`
 }
