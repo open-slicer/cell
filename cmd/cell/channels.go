@@ -302,7 +302,7 @@ func handleInvitesPOST(c *gin.Context) {
 
 func handleInvitesGET(c *gin.Context) {
 	i := invite{
-		Name: c.Param("name"),
+		Name: c.Param("invite"),
 	}
 	if err := i.get(); err != nil {
 		if err != pgx.ErrNoRows {
@@ -326,7 +326,7 @@ func handleInvitesGET(c *gin.Context) {
 
 func handleInvitesAcceptGET(c *gin.Context) {
 	i := invite{
-		Name: c.Param("name"),
+		Name: c.Param("invite"),
 	}
 	if err := i.get(); err != nil {
 		if err != pgx.ErrNoRows {
