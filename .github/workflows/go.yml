@@ -30,5 +30,8 @@ jobs:
             dep ensure
         fi
 
-    - name: Build
-      run: go build -v .
+    - name: Build cell
+      run: go build -v ./cmd/cell
+
+    - name: Build locketd
+      run: go build -v ./cmd/locketd
