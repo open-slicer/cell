@@ -34,6 +34,14 @@ func (c *channel) insert() error {
 	return err
 }
 
+func (c *channel) parentExists() (bool, error) {
+	var exists bool
+	err := pg.QueryRow(
+		context.Background(), "SELECT EXISTS(SELECT 1 FROM channels WHERE id = $1)", c.Parent,
+	).Scan(&exists)
+	return exists, err
+}
+
 type channelInsertion struct {
 	Name   string `json:"name" binding:"required,gte=1,lte=32"`
 	Parent string `json:"parent" binding:"lte=20"`
