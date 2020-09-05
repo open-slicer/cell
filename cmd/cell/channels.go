@@ -63,50 +63,9 @@ type channelInsertion struct {
 	Parent string `json:"parent" binding:"lte=20"`
 }
 
-func (req *channelInsertion) insert(requesterID string) response {
-	c := channel{
-		Name:   req.Name,
-		Owner:  requesterID,
-		Parent: req.Parent,
-	}
-	if req.Parent != "" {
-		exists, err := c.parentExists()
-		if err != nil {
-			return internalError(err)
-		}
-		if !exists {
-			return response{
-				Code:    errorParentNotExists,
-				Message: "A parent channel with the given ID doesn't exist",
-				HTTP:    http.StatusConflict,
-			}
-		}
-	}
-
-	c.ID = idNode.Generate().String()
-	if err := c.insert(); err != nil {
-		return internalError(err)
-	}
-
-	m := member{
-		ID:      idNode.Generate().String(),
-		User:    c.Owner,
-		Channel: c.ID,
-	}
-	if err := m.insert(); err != nil {
-		return internalError(err)
-	}
-
-	return response{
-		Code:    http.StatusCreated,
-		Message: "Channel created and member created for owner",
-		Data:    c,
-	}
-}
-
 func handleChannelsPOST(c *gin.Context) {
-	channel := channelInsertion{}
-	if err := c.ShouldBindJSON(&channel); err != nil {
+	req := channelInsertion{}
+	if err := c.ShouldBindJSON(&req); err != nil {
 		response{
 			Code:    errorBindFailed,
 			Message: "Failed to bind JSON",
@@ -117,7 +76,48 @@ func handleChannelsPOST(c *gin.Context) {
 	}
 
 	claims := jwt.ExtractClaims(c)
-	channel.insert(claims[identityKey].(string)).send(c)
+	ch := channel{
+		Name:   req.Name,
+		Owner:  claims[identityKey].(string),
+		Parent: req.Parent,
+	}
+	if req.Parent != "" {
+		exists, err := ch.parentExists()
+		if err != nil {
+			internalError(err).send(c)
+			return
+		}
+		if !exists {
+			response{
+				Code:    errorParentNotExists,
+				Message: "A parent channel with the given ID doesn't exist",
+				HTTP:    http.StatusConflict,
+			}.send(c)
+			return
+		}
+	}
+
+	ch.ID = idNode.Generate().String()
+	if err := ch.insert(); err != nil {
+		internalError(err).send(c)
+		return
+	}
+
+	m := member{
+		ID:      idNode.Generate().String(),
+		User:    ch.Owner,
+		Channel: ch.ID,
+	}
+	if err := m.insert(); err != nil {
+		internalError(err).send(c)
+		return
+	}
+
+	response{
+		Code:    http.StatusCreated,
+		Message: "Channel created and member created for owner",
+		Data:    ch,
+	}.send(c)
 }
 
 func (c *channel) get() response {
