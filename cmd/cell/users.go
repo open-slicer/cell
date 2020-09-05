@@ -137,7 +137,7 @@ func handleUsersPOST(c *gin.Context) {
 	}.send(c)
 }
 
-func handleUsersGet(c *gin.Context) {
+func handleUsersGET(c *gin.Context) {
 	user := user{
 		ID: c.Param("id"),
 	}

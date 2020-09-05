@@ -38,7 +38,7 @@ func setupRouter() *gin.Engine {
 		users := v2.Group("/users")
 		{
 			users.POST("", handleUsersPOST)
-			users.GET("/:id", authBlock, handleUsersGet)
+			users.GET("/:id", authBlock, handleUsersGET)
 		}
 
 		auth := v2.Group("/auth")
