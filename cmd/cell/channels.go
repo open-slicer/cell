@@ -283,10 +283,7 @@ func handleInvitesGET(c *gin.Context) {
 }
 
 func (i *invite) accept(requesterID string) response {
-	var channelID string
-	if err := pg.QueryRow(
-		context.Background(), "SELECT channel FROM invites WHERE name = $1", i.Name,
-	).Scan(&channelID); err != nil {
+	if err := i.get(); err != nil {
 		if err != pgx.ErrNoRows {
 			return internalError(err)
 		}
@@ -301,7 +298,7 @@ func (i *invite) accept(requesterID string) response {
 	if err := pg.QueryRow(
 		context.Background(),
 		"SELECT EXISTS(SELECT 1 FROM members WHERE \"user\" = $1 AND channel = $2)",
-		requesterID, channelID,
+		requesterID, i.Channel,
 	).Scan(&exists); err != nil {
 		return internalError(err)
 	}
@@ -310,15 +307,16 @@ func (i *invite) accept(requesterID string) response {
 			Code:    errorExists,
 			Message: "Invite already accepted",
 			HTTP:    http.StatusConflict,
-			Data:    channelID,
+			Data:    i.Channel,
 		}
 	}
 
-	if _, err := pg.Exec(
-		context.Background(),
-		"INSERT INTO members (id, \"user\", channel) VALUES ($1, $2, $3)",
-		idNode.Generate().String(), requesterID, channelID,
-	); err != nil {
+	m := member{
+		ID:      idNode.Generate().String(),
+		User:    requesterID,
+		Channel: i.Channel,
+	}
+	if err := m.insert(); err != nil {
 		return internalError(err)
 	}
 	return response{
