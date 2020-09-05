@@ -186,58 +186,9 @@ type inviteInsertion struct {
 	Name string `json:"name" binding:"required,gte=4,lte=32"`
 }
 
-func (req *inviteInsertion) insert(requesterID, channelID string) response {
-	if !commonNameRegex.MatchString(req.Name) {
-		return response{
-			Code:    errorNotCommonName,
-			Message: "Name didn't match the commonName regex",
-			HTTP:    http.StatusBadRequest,
-			Data:    commonNameRegex.String(),
-		}
-	}
-
-	i := invite{
-		Name:    req.Name,
-		Channel: channelID,
-		Owner:   requesterID,
-	}
-	exists, err := i.exists()
-	if err != nil {
-		return internalError(err)
-	}
-	if exists {
-		return response{
-			Code:    errorExists,
-			Message: "An invite with the given name already exists",
-			HTTP:    http.StatusConflict,
-		}
-	}
-
-	channelExists, err := i.channelExists()
-	if err != nil {
-		return internalError(err)
-	}
-	if !channelExists {
-		return response{
-			Code:    errorNotFound,
-			Message: "A channel with the given ID doesn't exist",
-			HTTP:    http.StatusNotFound,
-		}
-	}
-
-	if err := i.insert(); err != nil {
-		return internalError(err)
-	}
-	return response{
-		Code:    http.StatusCreated,
-		Message: "Invite created",
-		Data:    i,
-	}
-}
-
 func handleInvitesPOST(c *gin.Context) {
-	invite := inviteInsertion{}
-	if err := c.ShouldBindJSON(&invite); err != nil {
+	req := inviteInsertion{}
+	if err := c.ShouldBindJSON(&req); err != nil {
 		response{
 			Code:    errorBindFailed,
 			Message: "Failed to bind JSON",
@@ -246,9 +197,59 @@ func handleInvitesPOST(c *gin.Context) {
 		}.send(c)
 		return
 	}
+	if !commonNameRegex.MatchString(req.Name) {
+		response{
+			Code:    errorNotCommonName,
+			Message: "Name didn't match the commonName regex",
+			HTTP:    http.StatusBadRequest,
+			Data:    commonNameRegex.String(),
+		}.send(c)
+		return
+	}
 
 	claims := jwt.ExtractClaims(c)
-	invite.insert(claims[identityKey].(string), c.Param("id")).send(c)
+	i := invite{
+		Name:    req.Name,
+		Channel: c.Param("id"),
+		Owner:   claims[identityKey].(string),
+	}
+	exists, err := i.exists()
+	if err != nil {
+		internalError(err).send(c)
+		return
+	}
+	if exists {
+		response{
+			Code:    errorExists,
+			Message: "An invite with the given name already exists",
+			HTTP:    http.StatusConflict,
+		}.send(c)
+		return
+	}
+
+	channelExists, err := i.channelExists()
+	if err != nil {
+		internalError(err).send(c)
+		return
+	}
+	if !channelExists {
+		response{
+			Code:    errorNotFound,
+			Message: "A channel with the given ID doesn't exist",
+			HTTP:    http.StatusNotFound,
+		}.send(c)
+		return
+	}
+
+	if err := i.insert(); err != nil {
+		internalError(err).send(c)
+		return
+	}
+	response{
+		Code:    http.StatusCreated,
+		Message: "Invite created",
+		Data:    i,
+	}.send(c)
 }
 
 func (i *invite) get() response {
