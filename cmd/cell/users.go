@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strings"
 
+	"github.com/jackc/pgx/v4"
+	"github.com/nbutton23/zxcvbn-go"
+
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/nbutton23/zxcvbn-go"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -20,6 +21,26 @@ type user struct {
 	DisplayName  string `json:"display_name,omitempty"`
 	PublicKey    []byte `json:"public_key"`
 	PasswordHash []byte `json:"-"`
+}
+
+func (u *user) insert() error {
+	u.ID = idNode.Generate().String()
+	_, err := pg.Exec(
+		context.Background(),
+		"INSERT INTO users (id, username, display_name, password_hash, public_key) VALUES ($1, $2, $3, $4, $5)",
+		u.ID, u.Username, u.DisplayName, u.PasswordHash, u.PublicKey,
+	)
+	return err
+}
+
+func (u *user) exists() (bool, error) {
+	var exists bool
+	if err := pg.QueryRow(
+		context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", u.Username,
+	).Scan(&exists); err != nil {
+		return false, err
+	}
+	return exists, nil
 }
 
 type userInsertion struct {
@@ -34,38 +55,37 @@ type userLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
-func (req *userInsertion) insert() response {
+func handleUsersPost(c *gin.Context) {
+	req := userInsertion{}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response{
+			Code:    errorBindFailed,
+			Message: "Failed to bind JSON",
+			HTTP:    http.StatusBadRequest,
+			Data:    err.Error(),
+		}.send(c)
+		return
+	}
+
 	if !commonNameRegex.MatchString(req.Username) {
-		return response{
+		response{
 			Code:    errorBindFailed,
 			Message: "Username didn't match the required regex",
 			HTTP:    http.StatusBadRequest,
 			Data:    commonNameRegex.String(),
-		}
+		}.send(c)
+		return
 	}
 
 	passStrength := zxcvbn.PasswordStrength(req.Password, []string{req.Username, req.DisplayName})
 	if passStrength.Score < 3 {
-		return response{
+		response{
 			Code:    errorPasswordInsecure,
 			Message: fmt.Sprintf("Password is not secure under zxcvbn (got %d, want >=3)", passStrength.Score),
 			HTTP:    http.StatusBadRequest,
 			Data:    passStrength,
-		}
-	}
-
-	var alreadyExists bool
-	if err := pg.QueryRow(
-		context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", req.Username,
-	).Scan(&alreadyExists); err != nil {
-		return internalError(err)
-	}
-	if alreadyExists {
-		return response{
-			Code:    errorExists,
-			Message: "A user with the given username already exists",
-			HTTP:    http.StatusConflict,
-		}
+		}.send(c)
+		return
 	}
 
 	u := user{
@@ -77,39 +97,34 @@ func (req *userInsertion) insert() response {
 		u.DisplayName = strings.TrimSpace(u.DisplayName)
 	}
 
-	var err error
-	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	alreadyExists, err := u.exists()
 	if err != nil {
-		return internalError(err)
+		internalError(err).send(c)
+		return
 	}
-
-	if _, err := pg.Exec(
-		context.Background(),
-		"INSERT INTO users (id, username, display_name, password_hash, public_key) VALUES ($1, $2, $3, $4, $5)",
-		u.ID, u.Username, u.DisplayName, u.PasswordHash, u.PublicKey,
-	); err != nil {
-		return internalError(err)
-	}
-	return response{
-		Code:    http.StatusCreated,
-		Message: "User created",
-		Data:    u,
-	}
-}
-
-func handleUsersPost(c *gin.Context) {
-	user := userInsertion{}
-	if err := c.ShouldBindJSON(&user); err != nil {
+	if alreadyExists {
 		response{
-			Code:    errorBindFailed,
-			Message: "Failed to bind JSON",
-			HTTP:    http.StatusBadRequest,
-			Data:    err.Error(),
+			Code:    errorExists,
+			Message: "A user with the given username already exists",
+			HTTP:    http.StatusConflict,
 		}.send(c)
 		return
 	}
 
-	user.insert().send(c)
+	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		internalError(err).send(c)
+		return
+	}
+	if err := u.insert(); err != nil {
+		internalError(err).send(c)
+		return
+	}
+	response{
+		Code:    http.StatusCreated,
+		Message: "User created",
+		Data:    u,
+	}.send(c)
 }
 
 func (u *user) get() response {
