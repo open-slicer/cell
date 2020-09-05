@@ -37,12 +37,10 @@ func (u *user) insert() error {
 // exists checks if a user is present in the DB.
 func (u *user) exists() (bool, error) {
 	var exists bool
-	if err := pg.QueryRow(
+	err := pg.QueryRow(
 		context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", u.Username,
-	).Scan(&exists); err != nil {
-		return false, err
-	}
-	return exists, nil
+	).Scan(&exists)
+	return exists, err
 }
 
 // get uses the ID field to query the users table for the remainder of the struct's fields. This excludes user.PasswordHash.
