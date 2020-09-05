@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Cell - Cell Manual</title>
+        <title>Config - Cell Manual</title>
         
         
 
@@ -93,7 +93,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="0-cell.html" class="active">Cell</a></li><li class="chapter-item expanded "><a href="1-configuration.html"><strong aria-hidden="true">1.</strong> Configuration</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded "><a href="config.html" class="active"><strong aria-hidden="true">1.</strong> Config</a></li><li class="chapter-item expanded "><a href="scaling.html"><strong aria-hidden="true">2.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="locket.html"><strong aria-hidden="true">3.</strong> Locket</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -159,20 +159,43 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#cell" id="cell">Cell</a></h1>
-<p>This documents Cell, the reference implementation of Slicer written in Rust. Slicer is a secure and open messaging protocol.</p>
-<h2><a class="header" href="#licenses-and-acknowledgements" id="licenses-and-acknowledgements">Licenses and acknowledgements</a></h2>
-<p>The Slicer specification (WIP) is licensed under <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>. Cell is licensed under the <a href="https://github.com/UseSlicer/Cell/blob/master/LICENSE">Apache License 2.0</a>, written in <a href="https://rust-lang.org">Rust</a> using <a href="https://rocket.rs">Rocket</a>.</p>
-<p>This documentation uses <a href="https://github.com/rust-lang/mdBook">mdBook</a>, maintained by the Rust team and licensed under the <a href="https://github.com/rust-lang/mdBook/blob/master/LICENSE">Mozilla Public License 2.0</a>. The documentation itself is licensed under <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>, the same as the Slicer spec.</p>
+                        <h1><a class="header" href="#config" id="config">Config</a></h1>
+<p>A simple file is what manages Cell's config. This should be named <code>cell.extension</code>, where <code>extension</code> is essentially any common config file type (e.g. <code>cell.yml</code>). If an extension isn't passed, YAML will be used.</p>
+<h2><a class="header" href="#example" id="example">Example</a></h2>
+<pre><code class="language-yaml"># cell.yml
+environment: release # Enables verbose logging (debug or release)
+http:
+  address: ':8080' # The address to bind on
+database:
+  mongodb: 'mongodb://localhost:27017' # A MongoDB connection string
+  redis:
+    address: 'localhost:6379' # The Redis instance's address
+    password: '' # The Redis password; leave empty if you haven't set one
+    db: 0 # The Redis DB to use
+sentry:
+  dsn: 'https://00000000000000000000000000000000@0000000.ingest.sentry.io/0000000' # The optional Sentry DSN to use
+security:
+  secret: rh4NaXhju914cn60CHmuMREeQG1Qdh53o4sQ9iZWVlA= # A secure 32 byte key; try `openssl rand -base64 32`
+  cert_file: ./some.crt # The optional SSL cert to use
+  key_file: ./some.key # The optional SSL key to use
+locket:
+  token: some very secure password # The password to use to secure the `/lockets` endpoint
+prometheus:
+  token: some very secure password # The password to use to secure the `/metrics` endpoint
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
+                            <a rel="prev" href="intro.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
 
                         
-                            <a rel="next" href="1-configuration.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="scaling.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -184,9 +207,13 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
+                    <a rel="prev" href="intro.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
 
                 
-                    <a rel="next" href="1-configuration.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="scaling.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="0-cell.html">Cell</a></li><li class="chapter-item expanded "><a href="1-configuration.html"><strong aria-hidden="true">1.</strong> Configuration</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">1.</strong> Config</a></li><li class="chapter-item expanded "><a href="scaling.html"><strong aria-hidden="true">2.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="locket.html"><strong aria-hidden="true">3.</strong> Locket</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -161,22 +161,102 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#cell" id="cell">Cell</a></h1>
-<p>This documents Cell, the reference implementation of Slicer written in Rust. Slicer is a secure and open messaging protocol.</p>
-<h2><a class="header" href="#licenses-and-acknowledgements" id="licenses-and-acknowledgements">Licenses and acknowledgements</a></h2>
-<p>The Slicer specification (WIP) is licensed under <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>. Cell is licensed under the <a href="https://github.com/UseSlicer/Cell/blob/master/LICENSE">Apache License 2.0</a>, written in <a href="https://rust-lang.org">Rust</a> using <a href="https://rocket.rs">Rocket</a>.</p>
-<p>This documentation uses <a href="https://github.com/rust-lang/mdBook">mdBook</a>, maintained by the Rust team and licensed under the <a href="https://github.com/rust-lang/mdBook/blob/master/LICENSE">Mozilla Public License 2.0</a>. The documentation itself is licensed under <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>, the same as the Slicer spec.</p>
-<h1><a class="header" href="#configuration" id="configuration">Configuration</a></h1>
-<blockquote>
-<p>The configuration format Cell uses is <a href="https://github.com/toml-lang/toml">TOML</a>.</p>
-</blockquote>
-<p>Cell's config is managed through <code>Rocket.toml</code>. The app will search for this file upon initialisation. The <em>required</em> keys, as of now, are simply for the database:</p>
-<pre><code class="language-toml">[global.databases]
-postgres = { url = &quot;postgres://username:password@hostname:port/database_name?sslmode=prefer&quot; }
+                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+<p>Welcome to the Cell documentation. Currently, it's expected that Cell's API will change <em>a lot</em>; it's in early stages. This manual should act as developers' documentation for <strong>API v2</strong>, but also a reference for contributors to Cell.</p>
+<p>!!! warning
+API v1 (<code>/api/v1</code>) is deprecated and isn't available in Cell. This was part of the original Go implementation, but it has been rewritten.</p>
+<h2><a class="header" href="#main-ideas" id="main-ideas">Main ideas</a></h2>
+<p>The REST API exposes everything outgoing that doesn't require a persistent connection. This allows clients without the ability to hold long-running connections to use Cell. Contrary to this, <a href="https://en.wikipedia.org/wiki/WebSocket">WebSocket</a> is used for incoming data (e.g. events); this is what allows realtime communication.</p>
+<p>For example, to send a message you'd make a REST POST request to <code>/api/v2/channels/:id/messages</code>. This is then able to be received by GETting <code>/api/v2/lockets</code>, using the link in the response and waiting for a message create event. The payload will also contain the message body, so making another request to get it shouldn't be a requirement.</p>
+<h2><a class="header" href="#encryption" id="encryption">Encryption</a></h2>
+<p>PGP is used to encrypt messages. This must be done on the client; otherwise, it'd deprecate the entire reason this exists! The only thing Cell has to do about encryption is message validation and public key storage. On top of this, <a href="https://en.wikipedia.org/wiki/Bcrypt">bcrypt</a> is used to hash passwords.</p>
+<p>This will be covered in more detail.</p>
+<h2><a class="header" href="#responses" id="responses">Responses</a></h2>
+<p>The API (excluding Lockets and <code>/api/v2/auth</code>) will respond with this:</p>
+<pre><code class="language-json">{
+    &quot;code&quot;: 0,
+    &quot;message&quot;: &quot;Pretty message (intended for humans, not computers)&quot;,
+    &quot;data&quot;: &quot;any type&quot;
+}
 </code></pre>
-<p>Make sure to replace these values. You'll have noticed <code>sslmode</code>; this makes connecting to Postgres with SSL optional. The possible values include:</p>
-<p><img src="./img/sslmode.png" alt="Possible sslmode values" /></p>
-<p>If something's missing, Rocket has extensive documentation on how to configure it: <a href="https://rocket.rs/v0.4/guide/configuration/">Rocket docs</a>.</p>
+<h3><a class="header" href="#errors" id="errors">Errors</a></h3>
+<p>The <code>code</code> key of generic responses will be a HTTP status code on success, or an error code on error:</p>
+<pre><code class="language-text">errorDomainDidntMatch 7
+errorDomainFailedLookup 6
+errorInvalidConfigToken 5
+errorNotFound 4
+errorBindFailed 3
+errorPasswordInsecure 2
+errorExists 1
+errorInternalError 0
+</code></pre>
+<h1><a class="header" href="#config" id="config">Config</a></h1>
+<p>A simple file is what manages Cell's config. This should be named <code>cell.extension</code>, where <code>extension</code> is essentially any common config file type (e.g. <code>cell.yml</code>). If an extension isn't passed, YAML will be used.</p>
+<h2><a class="header" href="#example" id="example">Example</a></h2>
+<pre><code class="language-yaml"># cell.yml
+environment: release # Enables verbose logging (debug or release)
+http:
+  address: ':8080' # The address to bind on
+database:
+  mongodb: 'mongodb://localhost:27017' # A MongoDB connection string
+  redis:
+    address: 'localhost:6379' # The Redis instance's address
+    password: '' # The Redis password; leave empty if you haven't set one
+    db: 0 # The Redis DB to use
+sentry:
+  dsn: 'https://00000000000000000000000000000000@0000000.ingest.sentry.io/0000000' # The optional Sentry DSN to use
+security:
+  secret: rh4NaXhju914cn60CHmuMREeQG1Qdh53o4sQ9iZWVlA= # A secure 32 byte key; try `openssl rand -base64 32`
+  cert_file: ./some.crt # The optional SSL cert to use
+  key_file: ./some.key # The optional SSL key to use
+locket:
+  token: some very secure password # The password to use to secure the `/lockets` endpoint
+prometheus:
+  token: some very secure password # The password to use to secure the `/metrics` endpoint
+</code></pre>
+<h1><a class="header" href="#scaling" id="scaling">Scaling</a></h1>
+<p>This covers how Cell scales. Most of this is Cell-specific and not related to the Slicer specification.</p>
+<h2><a class="header" href="#websocket" id="websocket">WebSocket</a></h2>
+<p>Firstly, users GET <code>/api/v2/lockets</code> (excluding the version). This endpoint should inform clients of a suitable WS server (Locket), where they'll be able to establish a connection. WS servers should check if the server permitted the action in the last minute before allowing them to connect.</p>
+<p>!!! note
+This is specific to Cell; it's not part of the Slicer specification.</p>
+<p>Cell runs separate processes for WebSocket connections. The main process dispatches data to be sent over WS with Redis's pub/sub system, keyed by the user ID. All processes handling connections for the user receive the request and send the message over to each client; you're of course able to have more than one concurrent connection to Cell.</p>
+<p>!!! warning
+This is unimplemented.</p>
+<p>On top of this, each client (connection) has a unique ID. This allows the server to send connection-specific packets.</p>
+<h1><a class="header" href="#locket" id="locket">Locket</a></h1>
+<p>Locket is how Slicer clients can receive events and just partake in realtime web comms.</p>
+<p><code>locketd</code> is Cell's implementation. It allows Cell to be horizontally scalable, as instances can register with the main Cell server by making an authorised HTTP request. Redis is used to dispatch requests to <code>locketd</code>; read more in the <a href="scaling.html">scaling section</a>.</p>
+<h2><a class="header" href="#api" id="api">API</a></h2>
+<p>The Locket API's main endpoint is <code>/api/v2/lockets</code>.</p>
+<h3><a class="header" href="#getting-a-locket" id="getting-a-locket">Getting a Locket</a></h3>
+<p>As a client (not a server like <code>locketd</code>), you may request to be assigned a Locket. This is required for WebSocket operations. To do this, you can make a GET request to <code>/api/v2/lockets</code>. This requires a bearer token.</p>
+<h4><a class="header" href="#response" id="response">Response</a></h4>
+<p>You'll receive an application/json response body. The <code>data</code> will be a string representing the address at which you can access the Locket: <code>domainOrIP:port</code>.</p>
+<h3><a class="header" href="#registering-a-locket" id="registering-a-locket">Registering a Locket</a></h3>
+<p>Lockets can be registered by making a <code>PUT</code> request to <code>/api/v2/lockets</code>. This expects the config value for <code>locket.token</code> to be present in the <code>Authorization</code> header.</p>
+<h4><a class="header" href="#request" id="request">Request</a></h4>
+<p>It expects an application/json body:</p>
+<pre><code class="language-json">{
+  &quot;port&quot;: 8080,
+  &quot;host&quot;: &quot;some.locket.com&quot;
+}
+</code></pre>
+<h5><a class="header" href="#port" id="port"><code>port</code></a></h5>
+<p>Required. This is the TCP port that the Locket server is listening on.</p>
+<h5><a class="header" href="#host" id="host"><code>host</code></a></h5>
+<p>Defaults to the request IP. If provided, this should be a domain that points to the request IP.</p>
+<p>If there was an error looking up the domain, <code>errorDomainFailedLookup</code> will be thrown. If the lookup succeeded but the resulting IPs didn't include the request IP, <code>errorDomainDidntMatch</code> will be thrown.</p>
+<h4><a class="header" href="#response-1" id="response-1">Response</a></h4>
+<p>You'll receive an application/json response. Its <code>data</code> will be a <code>locketInterface</code> object:</p>
+<pre><code class="language-json">{
+  &quot;port&quot;: 8080,
+  &quot;host&quot;: &quot;some.optional.locket.com&quot;
+}
+</code></pre>
+<h4><a class="header" href="#errors-1" id="errors-1">Errors</a></h4>
+<!-- TODO: number representations -->
+<p><code>errorDomainFailedLookup</code> and <code>errorDomainDidntMatch</code> are assigned to this endpoint. See the body section for when it'll be thrown.</p>
 
                     </main>
 

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Cell - Cell Manual</title>
+        <title>Introduction - Cell Manual</title>
         
         
 
@@ -93,7 +93,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="0-cell.html">Cell</a></li><li class="chapter-item expanded "><a href="1-configuration.html"><strong aria-hidden="true">1.</strong> Configuration</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">1.</strong> Config</a></li><li class="chapter-item expanded "><a href="scaling.html"><strong aria-hidden="true">2.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="locket.html"><strong aria-hidden="true">3.</strong> Locket</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -159,11 +159,35 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#cell" id="cell">Cell</a></h1>
-<p>This documents Cell, the reference implementation of Slicer written in Rust. Slicer is a secure and open messaging protocol.</p>
-<h2><a class="header" href="#licenses-and-acknowledgements" id="licenses-and-acknowledgements">Licenses and acknowledgements</a></h2>
-<p>The Slicer specification (WIP) is licensed under <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>. Cell is licensed under the <a href="https://github.com/UseSlicer/Cell/blob/master/LICENSE">Apache License 2.0</a>, written in <a href="https://rust-lang.org">Rust</a> using <a href="https://rocket.rs">Rocket</a>.</p>
-<p>This documentation uses <a href="https://github.com/rust-lang/mdBook">mdBook</a>, maintained by the Rust team and licensed under the <a href="https://github.com/rust-lang/mdBook/blob/master/LICENSE">Mozilla Public License 2.0</a>. The documentation itself is licensed under <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>, the same as the Slicer spec.</p>
+                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+<p>Welcome to the Cell documentation. Currently, it's expected that Cell's API will change <em>a lot</em>; it's in early stages. This manual should act as developers' documentation for <strong>API v2</strong>, but also a reference for contributors to Cell.</p>
+<p>!!! warning
+API v1 (<code>/api/v1</code>) is deprecated and isn't available in Cell. This was part of the original Go implementation, but it has been rewritten.</p>
+<h2><a class="header" href="#main-ideas" id="main-ideas">Main ideas</a></h2>
+<p>The REST API exposes everything outgoing that doesn't require a persistent connection. This allows clients without the ability to hold long-running connections to use Cell. Contrary to this, <a href="https://en.wikipedia.org/wiki/WebSocket">WebSocket</a> is used for incoming data (e.g. events); this is what allows realtime communication.</p>
+<p>For example, to send a message you'd make a REST POST request to <code>/api/v2/channels/:id/messages</code>. This is then able to be received by GETting <code>/api/v2/lockets</code>, using the link in the response and waiting for a message create event. The payload will also contain the message body, so making another request to get it shouldn't be a requirement.</p>
+<h2><a class="header" href="#encryption" id="encryption">Encryption</a></h2>
+<p>PGP is used to encrypt messages. This must be done on the client; otherwise, it'd deprecate the entire reason this exists! The only thing Cell has to do about encryption is message validation and public key storage. On top of this, <a href="https://en.wikipedia.org/wiki/Bcrypt">bcrypt</a> is used to hash passwords.</p>
+<p>This will be covered in more detail.</p>
+<h2><a class="header" href="#responses" id="responses">Responses</a></h2>
+<p>The API (excluding Lockets and <code>/api/v2/auth</code>) will respond with this:</p>
+<pre><code class="language-json">{
+    &quot;code&quot;: 0,
+    &quot;message&quot;: &quot;Pretty message (intended for humans, not computers)&quot;,
+    &quot;data&quot;: &quot;any type&quot;
+}
+</code></pre>
+<h3><a class="header" href="#errors" id="errors">Errors</a></h3>
+<p>The <code>code</code> key of generic responses will be a HTTP status code on success, or an error code on error:</p>
+<pre><code class="language-text">errorDomainDidntMatch 7
+errorDomainFailedLookup 6
+errorInvalidConfigToken 5
+errorNotFound 4
+errorBindFailed 3
+errorPasswordInsecure 2
+errorExists 1
+errorInternalError 0
+</code></pre>
 
                     </main>
 
@@ -172,7 +196,7 @@
                         
 
                         
-                            <a rel="next" href="1-configuration.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="config.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -186,7 +210,7 @@
                 
 
                 
-                    <a rel="next" href="1-configuration.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="config.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
