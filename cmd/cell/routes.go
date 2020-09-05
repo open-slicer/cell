@@ -70,16 +70,15 @@ func setupRouter() *gin.Engine {
 		{
 			channels.Use(authBlock)
 			channels.POST("", handleChannelsPOST)
-			channels.GET("/:id", handleChannelsGET)
 
-			invites := channels.Group("/:id/invites")
+			specific := channels.Group("/:channel")
 			{
-				invites.POST("", handleInvitesPOST)
-			}
-
-			members := channels.Group("/:channel/members")
-			{
-				members.GET("/:id", handleMembersGET)
+				specific.GET("", handleChannelsGET)
+				specific.POST("/invites", handleInvitesPOST)
+				members := specific.Group("/members")
+				{
+					members.GET("/:member", handleMembersGET)
+				}
 			}
 		}
 	}

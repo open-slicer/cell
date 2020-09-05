@@ -83,7 +83,7 @@ func (m *member) get() error {
 
 func handleMembersGET(c *gin.Context) {
 	member := member{
-		User:    c.Param("id"),
+		User:    c.Param("member"),
 		Channel: c.Param("channel"),
 	}
 	if err := member.get(); err != nil {
@@ -170,7 +170,7 @@ func handleChannelsPOST(c *gin.Context) {
 
 func handleChannelsGET(c *gin.Context) {
 	ch := channel{
-		ID: c.Param("id"),
+		ID: c.Param("channel"),
 	}
 
 	if err := ch.get(); err != nil {
@@ -258,7 +258,7 @@ func handleInvitesPOST(c *gin.Context) {
 	claims := jwt.ExtractClaims(c)
 	i := invite{
 		Name:    req.Name,
-		Channel: c.Param("id"),
+		Channel: c.Param("channel"),
 		Owner:   claims[identityKey].(string),
 	}
 	exists, err := i.exists()
