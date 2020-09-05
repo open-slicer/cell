@@ -91,20 +91,16 @@ func handleLocketsPUT(c *gin.Context) {
 	locket.insert(c.ClientIP()).send(c)
 }
 
-func (locket *locketInterface) get() response {
+func (locket *locketInterface) getHostname() (string, error) {
 	res, err := rdb.HGetAll(context.Background(), "lockets").Result()
 	if err != nil {
-		return internalError(err)
+		return "", err
 	}
 
 	for _, hostname := range res {
 		if used, ok := previousLockets[hostname]; !ok || !used {
 			previousLockets[hostname] = true
-			return response{
-				Code:    http.StatusOK,
-				Message: "Locket found",
-				Data:    hostname,
-			}
+			return hostname, nil
 		}
 	}
 
@@ -116,14 +112,20 @@ func (locket *locketInterface) get() response {
 		genesisLocket = hostname
 		break
 	}
-	return response{
-		Code:    http.StatusOK,
-		Message: "Locket found (reset)",
-		Data:    genesisLocket,
-	}
+	return genesisLocket, nil
 }
 
 func handleLocketsGET(c *gin.Context) {
 	locket := locketInterface{}
-	locket.get().send(c)
+	hostname, err := locket.getHostname()
+	if err != nil {
+		internalError(err).send(c)
+		return
+	}
+
+	response{
+		Code:    http.StatusOK,
+		Message: "Locket rotated",
+		Data:    hostname,
+	}.send(c)
 }
