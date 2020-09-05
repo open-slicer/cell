@@ -48,11 +48,14 @@ type channelInsertion struct {
 }
 
 func (req *channelInsertion) insert(requesterID string) response {
+	c := channel{
+		Name:   req.Name,
+		Owner:  requesterID,
+		Parent: req.Parent,
+	}
 	if req.Parent != "" {
-		var exists bool
-		if err := pg.QueryRow(
-			context.Background(), "SELECT EXISTS(SELECT 1 FROM channels WHERE id = $1)", req.Parent,
-		).Scan(&exists); err != nil {
+		exists, err := c.parentExists()
+		if err != nil {
 			return internalError(err)
 		}
 		if !exists {
@@ -64,12 +67,7 @@ func (req *channelInsertion) insert(requesterID string) response {
 		}
 	}
 
-	c := channel{
-		ID:     idNode.Generate().String(),
-		Name:   req.Name,
-		Owner:  requesterID,
-		Parent: req.Parent,
-	}
+	c.ID = idNode.Generate().String()
 	if err := c.insert(); err != nil {
 		return internalError(err)
 	}
