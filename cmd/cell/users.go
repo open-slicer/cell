@@ -35,6 +35,7 @@ func (u *user) insert() error {
 	return err
 }
 
+// exists checks if a user is present in the DB.
 func (u *user) exists() (bool, error) {
 	var exists bool
 	if err := pg.QueryRow(
