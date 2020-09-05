@@ -10,10 +10,10 @@ import (
 )
 
 type channel struct {
-	ID     string  `json:"id"`
-	Name   string  `json:"name"`
-	Owner  string  `json:"owner"`
-	Parent *string `json:"parent,omitempty"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Owner  string `json:"owner"`
+	Parent string `json:"parent,omitempty"`
 }
 
 type channelInsertion struct {
@@ -45,7 +45,7 @@ func (req *channelInsertion) insert(requesterID string) response {
 		ID:     idNode.Generate().String(),
 		Name:   req.Name,
 		Owner:  requesterID,
-		Parent: &req.Parent,
+		Parent: req.Parent,
 	}
 
 	var err error
