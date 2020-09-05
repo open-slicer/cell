@@ -70,6 +70,11 @@ func setupRouter() *gin.Engine {
 			{
 				invites.POST("", handleInvitesPOST)
 			}
+
+			members := channels.Group("/:channel/members")
+			{
+				members.GET("/:id", handleMembersGET)
+			}
 		}
 	}
 
