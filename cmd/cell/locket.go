@@ -34,6 +34,30 @@ func (locket *locketInterface) insert(ipAddr string) error {
 	).Err()
 }
 
+func (locket *locketInterface) getHostname() (string, error) {
+	res, err := rdb.HGetAll(context.Background(), "lockets").Result()
+	if err != nil {
+		return "", err
+	}
+
+	for _, hostname := range res {
+		if used, ok := previousLockets[hostname]; !ok || !used {
+			previousLockets[hostname] = true
+			return hostname, nil
+		}
+	}
+
+	// If we haven't returned yet, all lockets were used.
+	previousLockets = map[string]bool{}
+
+	var genesisLocket string
+	for _, hostname := range res {
+		genesisLocket = hostname
+		break
+	}
+	return genesisLocket, nil
+}
+
 func handleLocketsPUT(c *gin.Context) {
 	locket := locketInterface{}
 	if err := c.ShouldBindJSON(&locket); err != nil {
@@ -93,30 +117,6 @@ func handleLocketsPUT(c *gin.Context) {
 			Locket:   locket,
 		},
 	}.send(c)
-}
-
-func (locket *locketInterface) getHostname() (string, error) {
-	res, err := rdb.HGetAll(context.Background(), "lockets").Result()
-	if err != nil {
-		return "", err
-	}
-
-	for _, hostname := range res {
-		if used, ok := previousLockets[hostname]; !ok || !used {
-			previousLockets[hostname] = true
-			return hostname, nil
-		}
-	}
-
-	// If we haven't returned yet, all lockets were used.
-	previousLockets = map[string]bool{}
-
-	var genesisLocket string
-	for _, hostname := range res {
-		genesisLocket = hostname
-		break
-	}
-	return genesisLocket, nil
 }
 
 func handleLocketsGET(c *gin.Context) {
