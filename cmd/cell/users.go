@@ -130,34 +130,34 @@ func handleUsersPost(c *gin.Context) {
 	}.send(c)
 }
 
-func (u *user) get() response {
-	var fUser user
-
-	if err := pg.QueryRow(
-		context.Background(), "SELECT id, username, display_name, public_key FROM users WHERE id = $1", u.ID,
-	).Scan(&fUser.ID, &fUser.Username, &fUser.DisplayName, &fUser.PublicKey); err != nil {
-		if err != pgx.ErrNoRows {
-			return internalError(err)
-		}
-		return response{
-			Code:    errorNotFound,
-			Message: "User doesn't exist",
-			HTTP:    http.StatusNotFound,
-		}
-	}
-
-	return response{
-		Code:    http.StatusOK,
-		Message: "User found",
-		Data:    fUser,
-	}
+func (u *user) get() error {
+	return pg.QueryRow(
+		context.Background(), "SELECT username, display_name, public_key FROM users WHERE id = $1", u.ID,
+	).Scan(&u.Username, &u.DisplayName, &u.PublicKey)
 }
 
 func handleUsersGet(c *gin.Context) {
 	user := user{
 		ID: c.Param("id"),
 	}
-	user.get().send(c)
+	if err := user.get(); err != nil {
+		if err != pgx.ErrNoRows {
+			internalError(err).send(c)
+			return
+		}
+		response{
+			Code:    errorNotFound,
+			Message: "User doesn't exist",
+			HTTP:    http.StatusNotFound,
+		}.send(c)
+		return
+	}
+
+	response{
+		Code:    http.StatusOK,
+		Message: "User found",
+		Data:    user,
+	}.send(c)
 }
 
 const identityKey = "id"
