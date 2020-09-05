@@ -252,26 +252,10 @@ func handleInvitesPOST(c *gin.Context) {
 	}.send(c)
 }
 
-func (i *invite) get() response {
-	var fInvite invite
-	if err := pg.QueryRow(
+func (i *invite) get() error {
+	return pg.QueryRow(
 		context.Background(), "SELECT name, owner, channel FROM invites WHERE name = $1", i.Name,
-	).Scan(&fInvite.Name, &fInvite.Owner, &fInvite.Channel); err != nil {
-		if err != pgx.ErrNoRows {
-			return internalError(err)
-		}
-		return response{
-			Code:    errorNotFound,
-			Message: "Invite doesn't exist",
-			HTTP:    http.StatusNotFound,
-		}
-	}
-
-	return response{
-		Code:    http.StatusOK,
-		Message: "Invite found",
-		Data:    fInvite,
-	}
+	).Scan(i.Name, i.Owner, i.Channel)
 }
 
 func handleInvitesGET(c *gin.Context) {
