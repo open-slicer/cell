@@ -64,7 +64,10 @@ func internalError(err error) response {
 }
 
 func captureException(err error) string {
-	eventID := string(*sentry.CaptureException(err))
+	var eventID string
+	if useSentry {
+		eventID = string(*sentry.CaptureException(err))
+	}
 	log.Error().Str("id", eventID).Err(err).Msg("Exception captured")
 	return eventID
 }
