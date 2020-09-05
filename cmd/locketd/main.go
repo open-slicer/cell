@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/bwmarrin/snowflake"
 	"net"
 	"net/http"
 	"net/url"
@@ -11,6 +10,8 @@ import (
 	"os/signal"
 	"path"
 	"time"
+
+	"github.com/bwmarrin/snowflake"
 
 	"github.com/JakeMakesStuff/structuredhttp"
 	"github.com/go-redis/redis/v8"
@@ -126,6 +127,7 @@ func register() registrationResponseData {
 	if err = response.JSONToPointer(&respData); err != nil {
 		log.Fatal().Err(err).Msg("Couldn't unmarshal response data")
 	}
+	log.Info().Msg("Registered!")
 
 	return respData.Data
 }
