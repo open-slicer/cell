@@ -24,56 +24,14 @@ type locketPUTResponse struct {
 	Locket   locketInterface `json:"locket"`
 }
 
-func (locket *locketInterface) insert(ipAddr string) response {
-	if locket.Host != "" {
-		resolved := false
-
-		ips, err := net.LookupIP(locket.Host)
-		if err != nil {
-			return response{
-				Code:    errorDomainFailedLookup,
-				Message: "The domain provided couldn't be looked up",
-				HTTP:    http.StatusBadRequest,
-			}
-		}
-
-		for _, v := range ips {
-			if v.String() == ipAddr {
-				resolved = true
-				break
-			}
-		}
-		if !resolved {
-			return response{
-				Code:    errorDomainDidntMatch,
-				Message: "The domain provided didn't resolve to the client IP",
-				HTTP:    http.StatusBadRequest,
-			}
-		}
-	} else {
-		locket.Host = ipAddr
-	}
-
-	err := rdb.HSet(
+func (locket *locketInterface) insert(ipAddr string) error {
+	return rdb.HSet(
 		context.Background(),
 		"lockets",
 		map[string]interface{}{
 			ipAddr: fmt.Sprintf("%s:%d", locket.Host, locket.Port),
 		},
 	).Err()
-	if err != nil {
-		return internalError(err)
-	}
-	return response{
-		Code:    http.StatusCreated,
-		Message: "Locket added, expected to be ready",
-		Data: locketPUTResponse{
-			Address:  viper.GetString("database.redis.address"),
-			Password: viper.GetString("database.redis.password"),
-			DB:       viper.GetInt("database.redis.db"),
-			Locket:   *locket,
-		},
-	}
 }
 
 func handleLocketsPUT(c *gin.Context) {
@@ -88,7 +46,53 @@ func handleLocketsPUT(c *gin.Context) {
 		return
 	}
 
-	locket.insert(c.ClientIP()).send(c)
+	ipAddr := c.ClientIP()
+	// This is *essentially* content validation, so I think it's safe to put it here.
+	if locket.Host != "" {
+		resolved := false
+
+		ips, err := net.LookupIP(locket.Host)
+		if err != nil {
+			response{
+				Code:    errorDomainFailedLookup,
+				Message: "The domain provided couldn't be looked up",
+				HTTP:    http.StatusBadRequest,
+			}.send(c)
+			return
+		}
+
+		for _, v := range ips {
+			if v.String() == ipAddr {
+				resolved = true
+				break
+			}
+		}
+		if !resolved {
+			response{
+				Code:    errorDomainDidntMatch,
+				Message: "The domain provided didn't resolve to the client IP",
+				HTTP:    http.StatusBadRequest,
+			}.send(c)
+			return
+		}
+	} else {
+		locket.Host = ipAddr
+	}
+
+	if err := locket.insert(ipAddr); err != nil {
+		internalError(err).send(c)
+		return
+	}
+	response{
+		Code:    http.StatusCreated,
+		Message: "Locket added, expected to be ready",
+		Data: locketPUTResponse{
+			Address:  viper.GetString("database.redis.address"),
+			Password: viper.GetString("database.redis.password"),
+			DB:       viper.GetInt("database.redis.db"),
+			Locket:   locket,
+		},
+	}.send(c)
 }
 
 func (locket *locketInterface) getHostname() (string, error) {
