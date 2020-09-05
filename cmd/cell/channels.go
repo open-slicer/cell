@@ -265,7 +265,7 @@ func handleInvitesPOST(c *gin.Context) {
 func (i *invite) get() error {
 	return pg.QueryRow(
 		context.Background(), "SELECT owner, channel FROM invites WHERE name = $1", i.Name,
-	).Scan(i.Owner, i.Channel)
+	).Scan(&i.Owner, &i.Channel)
 }
 
 func handleInvitesGET(c *gin.Context) {
