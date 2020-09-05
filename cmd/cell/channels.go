@@ -212,11 +212,7 @@ func (req *inviteInsertion) insert(requesterID, channelID string) response {
 		Channel: channelID,
 		Owner:   requesterID,
 	}
-	if _, err := pg.Exec(
-		context.Background(),
-		"INSERT INTO invites (name, channel, owner) VALUES ($1, $2, $3)",
-		i.Name, i.Channel, i.Owner,
-	); err != nil {
+	if err := i.insert(); err != nil {
 		return internalError(err)
 	}
 
