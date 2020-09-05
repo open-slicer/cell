@@ -100,8 +100,7 @@ func handleUsersPost(c *gin.Context) {
 	}
 
 	u := user{
-		Username:  req.Username,
-		PublicKey: []byte(req.PublicKey),
+		Username: req.Username,
 	}
 	alreadyExists, err := u.exists()
 	if err != nil {
@@ -117,14 +116,15 @@ func handleUsersPost(c *gin.Context) {
 		return
 	}
 
-	if u.DisplayName != "" {
-		u.DisplayName = strings.TrimSpace(u.DisplayName)
-	}
 	u.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		internalError(err).send(c)
 		return
 	}
+	if u.DisplayName != "" {
+		u.DisplayName = strings.TrimSpace(u.DisplayName)
+	}
+	u.PublicKey = []byte(req.PublicKey)
 
 	if err := u.insert(); err != nil {
 		internalError(err).send(c)
