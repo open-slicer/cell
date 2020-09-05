@@ -42,6 +42,22 @@ func (c *channel) parentExists() (bool, error) {
 	return exists, err
 }
 
+type member struct {
+	ID          string `json:"id"`
+	User        string `json:"user"`
+	Channel     string `json:"channel"`
+	Permissions int64  `json:"permissions"`
+}
+
+func (m *member) insert() error {
+	_, err := pg.Exec(
+		context.Background(),
+		"INSERT INTO members (id, \"user\", channel) VALUES ($1, $2, $3)",
+		m.ID, m.User, m.Channel,
+	)
+	return err
+}
+
 type channelInsertion struct {
 	Name   string `json:"name" binding:"required,gte=1,lte=32"`
 	Parent string `json:"parent" binding:"lte=20"`
@@ -72,11 +88,12 @@ func (req *channelInsertion) insert(requesterID string) response {
 		return internalError(err)
 	}
 
-	if _, err := pg.Exec(
-		context.Background(),
-		"INSERT INTO members (id, \"user\", channel) VALUES ($1, $2, $3)",
-		idNode.Generate().String(), c.Owner, c.ID,
-	); err != nil {
+	m := member{
+		ID:      idNode.Generate().String(),
+		User:    c.Owner,
+		Channel: c.ID,
+	}
+	if err := m.insert(); err != nil {
 		return internalError(err)
 	}
 
