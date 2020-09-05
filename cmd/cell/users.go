@@ -137,7 +137,7 @@ func handleUsersPOST(c *gin.Context) {
 
 func handleUsersGET(c *gin.Context) {
 	user := user{
-		ID: c.Param("id"),
+		ID: c.Param("user"),
 	}
 	if err := user.get(); err != nil {
 		if err != pgx.ErrNoRows {
