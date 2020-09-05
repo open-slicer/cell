@@ -49,7 +49,6 @@ func main() {
 	}
 
 	if dsn := viper.GetString("sentry.dsn"); dsn != "" {
-		log.Debug().Str("dsn", dsn).Msg("Initialising Sentry")
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn: dsn,
 		})
