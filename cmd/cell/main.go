@@ -22,6 +22,8 @@ var pg *pgx.Conn
 
 const epoch = 1577836800398
 
+var useSentry = false
+
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	snowflake.Epoch = epoch
@@ -47,6 +49,8 @@ func main() {
 	}
 
 	if dsn := viper.GetString("sentry.dsn"); dsn != "" {
+		useSentry = true
+
 		log.Debug().Str("dsn", dsn).Msg("Initialising Sentry")
 		err := sentry.Init(sentry.ClientOptions{
 			Dsn: dsn,
