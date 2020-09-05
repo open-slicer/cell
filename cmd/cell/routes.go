@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/viper"
 )
 
 func setupRouter() *gin.Engine {
@@ -13,11 +14,11 @@ func setupRouter() *gin.Engine {
 
 	// TODO: Make this stricter.
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"*"},
-		AllowHeaders:     []string{"*"},
-		ExposeHeaders:    []string{"*"},
-		AllowCredentials: true,
+		AllowOrigins:     viper.GetStringSlice("cors.allowed_origins"),
+		AllowMethods:     viper.GetStringSlice("cors.alloewd_methods"),
+		AllowHeaders:     viper.GetStringSlice("cors.allowed_headers"),
+		ExposeHeaders:    viper.GetStringSlice("cors.exposed_headers"),
+		AllowCredentials: viper.GetBool("cors.allow_credentials"),
 	}))
 
 	r.GET("/", func(c *gin.Context) {
