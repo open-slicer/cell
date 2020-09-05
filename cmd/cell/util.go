@@ -27,6 +27,7 @@ const (
 	errorDomainDidntMatch
 	errorParentNotExists
 	errorNotCommonName
+	errorOutOfLockets
 )
 
 var commonNameRegex = regexp.MustCompile("^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$")
