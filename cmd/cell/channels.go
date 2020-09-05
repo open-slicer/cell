@@ -74,6 +74,38 @@ func (m *member) exists() (bool, error) {
 	return exists, err
 }
 
+func (m *member) get() error {
+	return pg.QueryRow(
+		context.Background(), "SELECT permissions FROM members WHERE \"user\" = $1 AND channel = $2)",
+		m.User, m.Channel,
+	).Scan(&m.Permissions)
+}
+
+func handleMembersGET(c *gin.Context) {
+	member := member{
+		User:    c.Param("id"),
+		Channel: c.Param("channel"),
+	}
+	if err := member.get(); err != nil {
+		if err != pgx.ErrNoRows {
+			internalError(err).send(c)
+			return
+		}
+		response{
+			Code:    errorNotFound,
+			Message: "Member doesn't exist",
+			HTTP:    http.StatusNotFound,
+		}.send(c)
+		return
+	}
+
+	response{
+		Code:    http.StatusOK,
+		Message: "Member found",
+		Data:    member,
+	}.send(c)
+}
+
 type channelInsertion struct {
 	Name   string `json:"name" binding:"required,gte=1,lte=32"`
 	Parent string `json:"parent" binding:"lte=20"`
