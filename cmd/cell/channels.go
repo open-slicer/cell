@@ -120,33 +120,35 @@ func handleChannelsPOST(c *gin.Context) {
 	}.send(c)
 }
 
-func (c *channel) get() response {
-	var fChannel channel
-	if err := pg.QueryRow(
+func (c *channel) get() error {
+	return pg.QueryRow(
 		context.Background(), "SELECT id, name, owner, parent FROM channels WHERE id = $1", c.ID,
-	).Scan(&fChannel.ID, &fChannel.Name, &fChannel.Owner, &fChannel.Parent); err != nil {
-		if err != pgx.ErrNoRows {
-			return internalError(err)
-		}
-		return response{
-			Code:    errorNotFound,
-			Message: "Channel doesn't exist",
-			HTTP:    http.StatusNotFound,
-		}
-	}
-
-	return response{
-		Code:    http.StatusOK,
-		Message: "Channel found",
-		Data:    fChannel,
-	}
+	).Scan(c.ID, c.Name, c.Owner, c.Parent)
 }
 
 func handleChannelsGET(c *gin.Context) {
-	channel := channel{
+	ch := channel{
 		ID: c.Param("id"),
 	}
-	channel.get().send(c)
+
+	if err := ch.get(); err != nil {
+		if err != pgx.ErrNoRows {
+			internalError(err).send(c)
+			return
+		}
+		response{
+			Code:    errorNotFound,
+			Message: "Channel doesn't exist",
+			HTTP:    http.StatusNotFound,
+		}.send(c)
+		return
+	}
+
+	response{
+		Code:    http.StatusOK,
+		Message: "Channel found",
+		Data:    ch,
+	}.send(c)
 }
 
 type invite struct {
