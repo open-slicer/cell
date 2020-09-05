@@ -45,6 +45,13 @@ func (u *user) exists() (bool, error) {
 	return exists, nil
 }
 
+// get uses the ID field to query the users table for the remainder of the struct's fields. This excludes user.PasswordHash.
+func (u *user) get() error {
+	return pg.QueryRow(
+		context.Background(), "SELECT username, display_name, public_key FROM users WHERE id = $1", u.ID,
+	).Scan(&u.Username, &u.DisplayName, &u.PublicKey)
+}
+
 // userInsertion implements the request clients should send when registering.
 type userInsertion struct {
 	Username    string `json:"username" binding:"required,gte=1,lte=32"`
@@ -128,12 +135,6 @@ func handleUsersPost(c *gin.Context) {
 		Message: "User created",
 		Data:    u,
 	}.send(c)
-}
-
-func (u *user) get() error {
-	return pg.QueryRow(
-		context.Background(), "SELECT username, display_name, public_key FROM users WHERE id = $1", u.ID,
-	).Scan(&u.Username, &u.DisplayName, &u.PublicKey)
 }
 
 func handleUsersGet(c *gin.Context) {
