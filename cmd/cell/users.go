@@ -24,6 +24,7 @@ type user struct {
 	PasswordHash []byte `json:"-"`
 }
 
+// insert inserts the user into the DB. This generates a unique identifier.
 func (u *user) insert() error {
 	u.ID = idNode.Generate().String()
 	_, err := pg.Exec(
