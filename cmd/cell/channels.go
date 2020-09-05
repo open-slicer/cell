@@ -306,6 +306,7 @@ func handleInvitesAcceptGET(c *gin.Context) {
 			Message: "Invite doesn't exist",
 			HTTP:    http.StatusNotFound,
 		}.send(c)
+		return
 	}
 
 	claims := jwt.ExtractClaims(c)
