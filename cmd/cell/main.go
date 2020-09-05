@@ -66,13 +66,13 @@ func main() {
 	}
 
 	redisAddr := viper.GetString("database.redis.address")
-	client := redis.NewClient(&redis.Options{
+	rdb = redis.NewClient(&redis.Options{
 		Addr:     redisAddr,
 		Password: viper.GetString("database.redis.password"),
 		DB:       viper.GetInt("database.redis.db"),
 	})
 
-	_, err = client.Ping(context.Background()).Result()
+	_, err = rdb.Ping(context.Background()).Result()
 	if err != nil {
 		log.Fatal().Err(err).Str("address", redisAddr).Msg("Failed to connect to Redis")
 	}
