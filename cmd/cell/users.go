@@ -66,8 +66,8 @@ type userLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// handleUsersPost handles POST /api/v2/users. This registers a new user.
-func handleUsersPost(c *gin.Context) {
+// handleUsersPOST handles POST /api/v2/users. This registers a new user.
+func handleUsersPOST(c *gin.Context) {
 	req := userInsertion{}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response{
