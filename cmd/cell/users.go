@@ -15,6 +15,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// user is representation of a registered account. This is stored in the DB.
 type user struct {
 	ID           string `json:"id"`
 	Username     string `json:"username"`
