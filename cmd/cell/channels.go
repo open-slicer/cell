@@ -292,50 +292,50 @@ func handleInvitesGET(c *gin.Context) {
 	}.send(c)
 }
 
-func (i *invite) accept(requesterID string) response {
+func handleInvitesAcceptGET(c *gin.Context) {
+	i := invite{
+		Name: c.Param("name"),
+	}
 	if err := i.get(); err != nil {
 		if err != pgx.ErrNoRows {
-			return internalError(err)
+			internalError(err).send(c)
+			return
 		}
-		return response{
+		response{
 			Code:    errorNotFound,
 			Message: "Invite doesn't exist",
 			HTTP:    http.StatusNotFound,
-		}
+		}.send(c)
 	}
 
+	claims := jwt.ExtractClaims(c)
 	m := member{
-		User:    requesterID,
+		User:    claims[identityKey].(string),
 		Channel: i.Channel,
 	}
 
 	exists, err := m.exists()
 	if err != nil {
-		return internalError(err)
+		internalError(err).send(c)
+		return
 	}
 	if exists {
-		return response{
+		response{
 			Code:    errorExists,
 			Message: "Invite already accepted",
 			HTTP:    http.StatusConflict,
 			Data:    m.Channel,
-		}
+		}.send(c)
+		return
 	}
 
 	m.ID = idNode.Generate().String()
 	if err := m.insert(); err != nil {
-		return internalError(err)
+		internalError(err).send(c)
+		return
 	}
-	return response{
+	response{
 		Code:    http.StatusCreated,
 		Message: "Invite accepted, member created",
-	}
-}
-
-func handleInvitesAcceptGET(c *gin.Context) {
-	invite := invite{
-		Name: c.Param("name"),
-	}
-	claims := jwt.ExtractClaims(c)
-	invite.accept(claims[identityKey].(string)).send(c)
+	}.send(c)
 }
