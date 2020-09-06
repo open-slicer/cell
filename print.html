@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded "><a href="administration/index.html"><strong aria-hidden="true">1.</strong> Administration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="administration/installation.html"><strong aria-hidden="true">1.1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="administration/configuration.html"><strong aria-hidden="true">1.2.</strong> Configuration</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -252,6 +252,92 @@ Account management, etc.</li>
 <li><input disabled="" type="checkbox"/>
 Kubernetes</li>
 </ul>
+<h1><a class="header" href="#administration" id="administration">Administration</a></h1>
+<p>It is possible to set up and use your own instance of Cell. Itself, Cell is incredibly lightweight; its two main dependencies include PostgreSQL and Redis, both of which shouldn’t add ‘’too’’ much to the load. It is also possible to scale Cell horizontally by using <code>locketd</code>. Do note that this manual does not cover securing your Cell instance. You will likely want to protect your PostgreSQL and Redis instances with some form of authentication.</p>
+<p>This manual assumes that you’re running Ubuntu.</p>
+<h1><a class="header" href="#installation" id="installation">Installation</a></h1>
+<p>At the end of this section, Cell should be installed. It will still require configuration.</p>
+<h2><a class="header" href="#installing-snap" id="installing-snap">Installing Snap</a></h2>
+<p><a href="https://snapcraft.io">Snap</a> is a great package manager for Linux; it’ll make this process a whole lot easier. You might already have it, but you’re able to use <code>apt</code>:</p>
+<pre><code class="language-console">$ sudo apt update
+$ sudo apt install snapd
+</code></pre>
+<h2><a class="header" href="#installing-go" id="installing-go">Installing Go</a></h2>
+<p><a href="https://golang.org">Go</a> is the programming language used by Cell. It’s available as a Snap:</p>
+<pre><code class="language-console">$ sudo snap install go --classic
+</code></pre>
+<h2><a class="header" href="#cloning-cell" id="cloning-cell">Cloning Cell</a></h2>
+<p>Since there aren’t any pre-built executables and migrations are stored in the repo, you need to clone the source. This can be done with <a href="https://git-scm.com">git</a>:</p>
+<pre><code class="language-console">$ git clone https://github.com/open-slicer/cell
+$ cd cell
+</code></pre>
+<p>Don’t worry about installing git; you likely already have it.</p>
+<h2><a class="header" href="#setting-up-postgresql" id="setting-up-postgresql">Setting up PostgreSQL</a></h2>
+<p>Cell relies on <a href="https://www.postgresql.org">PostgreSQL</a> to keep state for all userland structures.</p>
+<h3><a class="header" href="#installation-1" id="installation-1">Installation</a></h3>
+<p>The Snap for PostgreSQL is outdated.</p>
+<pre><code class="language-console">$ sudo sh -c 'echo &quot;deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main&quot; &gt; /etc/apt/sources.list.d/pgdg.list'
+$ sudo apt update
+$ curl -L https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+$ sudo apt install postgresql
+</code></pre>
+<h3><a class="header" href="#creating-a-database" id="creating-a-database">Creating a database</a></h3>
+<p>First, log in as <code>postgres</code> and open a PostgreSQL prompt:</p>
+<pre><code class="language-console">$ sudo su postgres
+$ psql
+</code></pre>
+<p>Now this is open, you can create a database called <code>cell</code>:</p>
+<pre><code class="language-sql">CREATE DATABASE cell;
+</code></pre>
+<p>To exit, type <code>exit</code>.</p>
+<h3><a class="header" href="#migrating-the-database" id="migrating-the-database">Migrating the database</a></h3>
+<p>Now that you’ve created a DB, you must migrate it. This is done with <a href="https://github.com/golang-migrate/migrate"><code>golang-migrate</code></a>.</p>
+<h4><a class="header" href="#installing-golang-migrate" id="installing-golang-migrate">Installing <code>golang-migrate</code></a></h4>
+<p>This, again, isn’t available through Snap:</p>
+<pre><code class="language-console">$ echo &quot;deb https://packagecloud.io/golang-migrate/migrate/ubuntu/ $(lsb_release -sc) main&quot; &gt; /etc/apt/sources.list.d/migrate.list
+$ sudo apt update
+$ curl -L https://packagecloud.io/golang-migrate/migrate/gpgkey | sudo apt-key add -
+$ sudo apt install migrate
+</code></pre>
+<h4><a class="header" href="#running-migrations" id="running-migrations">Running migrations</a></h4>
+<p>The <code>up</code> command can be used to migrate the DB:</p>
+<pre><code class="language-console">$ migrate -database 'postgres://username:password@localhost/cell' -path migrations up
+</code></pre>
+<p>Make sure to replace the placeholders here!</p>
+<h2><a class="header" href="#installing-redis" id="installing-redis">Installing Redis</a></h2>
+<p><a href="https://redis.io">Redis</a> is used to keep track of Lockets - WebSocket nodes - and publish messages to clients. It is available as a Snap:</p>
+<pre><code class="language-console">$ sudo snap install redis --classic
+</code></pre>
+<h1><a class="header" href="#configuration" id="configuration">Configuration</a></h1>
+<p>Cell looks for a config file in the working directory. It can be of JSON, TOML, YAML, HCL or Java properties format; the only requirement is that the file is called <code>cell.extension</code>, where extension can of course fit the format you’re using. If an extension isn’t provided, YAML will be used. This manual will use YAML.</p>
+<h2><a class="header" href="#example" id="example">Example</a></h2>
+<pre><code class="language-yaml">environment: release # Enables verbose logging (debug or release)
+node: 0 # The ID of the node; only change this if you're scaling up
+http:
+    address: :8080 # The address to bind on
+database:
+    postgres: postgres://username:password@localhost/cell # A pg connection string
+    redis:
+        address: localhost:6379 # The Redis instance's address
+        password: &quot;&quot; # The Redis password; leave empty if you haven't set one
+        db: 0 # The Redis DB to use
+sentry:
+    dsn: https://00000000000000000000000000000000@0000000.ingest.sentry.io/0000000 # The optional Sentry DSN to use
+cors:
+    allowed_origins: [&quot;*&quot;]
+    allowed_methods: [&quot;*&quot;]
+    allowed_headers: [&quot;*&quot;]
+    exposed_headers: [&quot;*&quot;]
+    allow_credentials: true
+security:
+    secret: rh4NaXhju914cn60CHmuMREeQG1Qdh53o4sQ9iZWVlA= # A secure 32 byte key; try `openssl rand -base64 32`
+    cert_file: &quot;&quot; # The optional location of an SSL cert to use
+    key_file: &quot;&quot; # The optional location of an SSL key to use
+locket:
+    token: extremely secure password # The password to use to secure the `/lockets` endpoint
+prometheus:
+    token: extremely secure password # The password to use to secure the `/metrics` endpoint
+</code></pre>
 
                     </main>
 
