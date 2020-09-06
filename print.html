@@ -291,7 +291,7 @@ $ psql
 </code></pre>
 <p>To exit, type <code>exit</code>.</p>
 <h3><a class="header" href="#migrating-the-database" id="migrating-the-database">Migrating the database</a></h3>
-<p>Now that you’ve created a DB, you must migrate it. This is done with <a href="https://github.com/golang-migrate/migrate"><code>golang-migrate</code></a>.</p>
+<p>After creating a DB, you must migrate it. This can be done with <a href="https://github.com/golang-migrate/migrate"><code>golang-migrate</code></a>.</p>
 <h4><a class="header" href="#installing-golang-migrate" id="installing-golang-migrate">Installing <code>golang-migrate</code></a></h4>
 <p>This, again, isn’t available through Snap:</p>
 <pre><code class="language-console">$ echo &quot;deb https://packagecloud.io/golang-migrate/migrate/ubuntu/ $(lsb_release -sc) main&quot; &gt; /etc/apt/sources.list.d/migrate.list
