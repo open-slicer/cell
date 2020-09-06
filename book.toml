@@ -6,7 +6,7 @@ src = "docs"
 title = "Cell Manual"
 
 [output.html]
-default-theme = "rust"
+default-theme = "light"
 preferred-dark-theme = "coal"
 curly-quotes = true
 git-repository-url = "https://github.com/open-slicer/cell"
