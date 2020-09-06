@@ -10,7 +10,7 @@
 - [x] Users
   - [x] Create
   - [x] Get
-  - [x] Auth:
+  - [x] Auth
     - [x] Login
     - [x] Refresh
 - [ ] Channels
