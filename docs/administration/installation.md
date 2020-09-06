@@ -64,7 +64,7 @@ To exit, type `exit`.
 
 ### Migrating the database
 
-Now that you've created a DB, you must migrate it. This is done with [`golang-migrate`](https://github.com/golang-migrate/migrate).
+After creating a DB, you must migrate it. This can be done with [`golang-migrate`](https://github.com/golang-migrate/migrate).
 
 #### Installing `golang-migrate`
 
