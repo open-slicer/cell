@@ -28,7 +28,9 @@
   - [x] Node
   - [x] Register
   - [x] Get/rotate
-- [ ] Metrics
-  - [x] Prometheus
-  - [ ] Some other instance-specific stuff could be done.
+- [ ] Administration
+  - [ ] Metrics
+    - [x] Prometheus
+    - [ ] Some other instance-specific stuff could be done.
+  - [ ] Account management, etc.
 - [ ] Kubernetes
