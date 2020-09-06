@@ -30,5 +30,5 @@
   - [x] Get/rotate
 - [ ] Metrics
   - [x] Prometheus
-  - Some other instance-specific stuff could be done.
+  - [ ] Some other instance-specific stuff could be done.
 - [ ] Kubernetes
