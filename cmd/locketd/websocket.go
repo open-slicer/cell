@@ -104,7 +104,7 @@ func (srv *websocketServer) subscribe(ctx context.Context, c *websocket.Conn, us
 	if listening, ok := currentlyListening[userID]; !ok || !listening {
 		currentlyListening[userID] = true
 		go func() {
-			pubsub := rdb.Subscribe(ctx, "locketuser:"+userID)
+			pubsub := rdb.Subscribe(ctx, "u:"+userID)
 			_, err := pubsub.Receive(ctx)
 			if err != nil {
 				return
