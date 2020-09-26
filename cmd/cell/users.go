@@ -50,6 +50,11 @@ func (u *user) get() error {
 	).Scan(&u.Username, &u.DisplayName, &u.PublicKey)
 }
 
+// dispatch sends an event to a user.
+func (u *user) dispatch(event eventIdentifier, data interface{}) error {
+	return rdb.Publish(context.Background(), "u:"+u.ID, data).Err()
+}
+
 // userInsertion implements the request clients should send when registering.
 type userInsertion struct {
 	Username    string `json:"username" binding:"required,gte=1,lte=32"`
