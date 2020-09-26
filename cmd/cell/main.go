@@ -96,5 +96,4 @@ func main() {
 	log.Info().Msg("Interrupt received, gracefully exiting")
 	_ = pg.Close(context.Background())
 	_ = rdb.Close()
-	os.Exit(0)
 }
