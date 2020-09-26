@@ -12,7 +12,6 @@ import (
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 
-	// TODO: Make this stricter.
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     viper.GetStringSlice("cors.allowed_origins"),
 		AllowMethods:     viper.GetStringSlice("cors.alloewd_methods"),
