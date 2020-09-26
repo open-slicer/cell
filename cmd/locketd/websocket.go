@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/rs/xid"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 	"nhooyr.io/websocket"
@@ -117,7 +118,7 @@ func (srv *websocketServer) subscribe(ctx context.Context, c *websocket.Conn, us
 	}
 
 	s := &subscriber{
-		id:       idNode.Generate().String(),
+		id:       xid.New().String(),
 		messages: make(chan []byte, srv.subscriberMessageBuffer),
 		closeSlow: func() {
 			c.Close(websocket.StatusPolicyViolation, "Connection couldn't keep up; too slow")

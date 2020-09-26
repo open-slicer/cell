@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/bwmarrin/snowflake"
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -14,8 +13,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
-
-var idNode *snowflake.Node
 
 var rdb *redis.Client
 var pg *pgx.Conn
@@ -26,7 +23,6 @@ var useSentry = false
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	snowflake.Epoch = epoch
 
 	viper.SetConfigName("cell")
 	viper.SetConfigType("yaml")
@@ -40,12 +36,6 @@ func main() {
 	if environment != "release" {
 		log.Logger = log.Level(zerolog.TraceLevel)
 		log.Info().Msg("Environment isn't 'release'; using trace level")
-	}
-
-	nodeID := viper.GetInt64("node")
-	idNode, err = snowflake.NewNode(nodeID)
-	if err != nil {
-		log.Fatal().Err(err).Int64("node_id", nodeID).Msg("Couldn't create id generator node")
 	}
 
 	if dsn := viper.GetString("sentry.dsn"); dsn != "" {

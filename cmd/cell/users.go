@@ -7,6 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/nbutton23/zxcvbn-go"
+	"github.com/rs/xid"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
@@ -122,7 +123,7 @@ func handleUsersPOST(c *gin.Context) {
 		u.DisplayName = strings.TrimSpace(u.DisplayName)
 	}
 	u.PublicKey = []byte(req.PublicKey)
-	u.ID = idNode.Generate().String()
+	u.ID = xid.New().String()
 
 	if err := u.insert(); err != nil {
 		internalError(err).send(c)

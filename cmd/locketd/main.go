@@ -11,8 +11,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/bwmarrin/snowflake"
-
 	"github.com/JakeMakesStuff/structuredhttp"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
@@ -41,13 +39,10 @@ type registrationResponseData struct {
 	DB       int    `json:"db"`
 }
 
-var idNode *snowflake.Node
-
 const epoch = 1577836800398
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	snowflake.Epoch = epoch
 
 	viper.SetConfigName("locketd")
 	viper.SetConfigType("yaml")
@@ -55,12 +50,6 @@ func main() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Couldn't read config")
-	}
-
-	nodeID := viper.GetInt64("node")
-	idNode, err = snowflake.NewNode(nodeID)
-	if err != nil {
-		log.Fatal().Err(err).Int64("node_id", nodeID).Msg("Couldn't create id generator node")
 	}
 
 	jwtSecret = []byte(viper.GetString("security.secret"))

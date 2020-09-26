@@ -7,6 +7,7 @@ import (
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
+	"github.com/rs/xid"
 )
 
 type channel struct {
@@ -145,14 +146,14 @@ func handleChannelsPOST(c *gin.Context) {
 		}
 	}
 
-	ch.ID = idNode.Generate().String()
+	ch.ID = xid.New().String()
 	if err := ch.insert(); err != nil {
 		internalError(err).send(c)
 		return
 	}
 
 	m := member{
-		ID:      idNode.Generate().String(),
+		ID:      xid.New().String(),
 		User:    ch.Owner,
 		Channel: ch.ID,
 	}
@@ -362,7 +363,7 @@ func handleInvitesAcceptGET(c *gin.Context) {
 		return
 	}
 
-	m.ID = idNode.Generate().String()
+	m.ID = xid.New().String()
 	if err := m.insert(); err != nil {
 		internalError(err).send(c)
 		return
