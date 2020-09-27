@@ -5,7 +5,22 @@
   <img src="https://github.com/open-slicer/cell/workflows/Go%20Build/badge.svg">
 </div>
 
-## Roadmap
+## what
+
+Cell implements the Slicer protocol in Go, consisting of two main components:
+
+- `cell` itself; and
+- `locketd`.
+
+`cell` is the basis for all operations. It has no in-memory state, so each instance is autonomous from clients. `locketd` instances register with `cell`; they don't actually do any work by themselves. `cell` broadcasts messages to all `locketd` instances keyed by the recipients' user IDs. They then pick up these messages, sending them to clients as required.
+
+## but why
+
+boredom
+
+oh but also, IRC is old and insecure. Modern platforms are fast. The latter usually can't be said about newer encrypted platforms.
+
+## stuff to do i guess
 
 - [x] Users
   - [x] Create
