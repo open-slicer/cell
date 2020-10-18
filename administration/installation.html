@@ -164,9 +164,9 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#installation" id="installation">Installation</a></h1>
-<p>At the end of this section, Cell should be installed. It will still require configuration.</p>
+<p>By the end of this section, Cell should be installed. It will still require configuration.</p>
 <h2><a class="header" href="#installing-snap" id="installing-snap">Installing Snap</a></h2>
-<p><a href="https://snapcraft.io">Snap</a> is a great package manager for Linux; it’ll make this process a whole lot easier. You might already have it, but you’re able to use <code>apt</code>:</p>
+<p><a href="https://snapcraft.io">Snap</a> is a great package manager for Linux; it’ll make this process a whole lot easier. You might already have it, but you’re able to install it with <code>apt</code>:</p>
 <pre><code class="language-console">$ sudo apt update
 $ sudo apt install snapd
 </code></pre>
@@ -180,6 +180,11 @@ $ sudo apt install snapd
 $ cd cell
 </code></pre>
 <p>Don’t worry about installing git; you likely already have it.</p>
+<h2><a class="header" href="#building-cell" id="building-cell">Building Cell</a></h2>
+<p>After cloning cell and installing Go, you’ll simply be able to run</p>
+<pre><code class="language-console">$ go install ./...
+</code></pre>
+<p>to build and add <code>cell</code> and <code>locketd</code> to your system. Assuming that you installed Go correctly, they will be included in your <code>PATH</code>; otherwise, you may access them in <code>$GOPATH/bin</code>.</p>
 <h2><a class="header" href="#setting-up-postgresql" id="setting-up-postgresql">Setting up PostgreSQL</a></h2>
 <p>Cell relies on <a href="https://www.postgresql.org">PostgreSQL</a> to keep state for all userland structures.</p>
 <h3><a class="header" href="#installation-1" id="installation-1">Installation</a></h3>
