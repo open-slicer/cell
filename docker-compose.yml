@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=canoe
+  redis:
+    image: redis
+    command: redis-server --save
+    volumes:
+      - ./.data/redis:/data
+  cell:
+    build: .
+    command: cell
+    depends_on:
+      - redis
+      - db
+  locketd:
+    command: locketd
+    depends_on:
+      - cell
