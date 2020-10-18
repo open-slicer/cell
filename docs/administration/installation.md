@@ -1,10 +1,10 @@
 # Installation
 
-At the end of this section, Cell should be installed. It will still require configuration.
+By the end of this section, Cell should be installed. It will still require configuration.
 
 ## Installing Snap
 
-[Snap](https://snapcraft.io) is a great package manager for Linux; it'll make this process a whole lot easier. You might already have it, but you're able to use `apt`:
+[Snap](https://snapcraft.io) is a great package manager for Linux; it'll make this process a whole lot easier. You might already have it, but you're able to install it with `apt`:
 
 ```console
 $ sudo apt update
@@ -29,6 +29,16 @@ $ cd cell
 ```
 
 Don't worry about installing git; you likely already have it.
+
+## Building Cell
+
+After cloning cell and installing Go, you'll simply be able to run
+
+```console
+$ go install ./...
+```
+
+to build and add `cell` and `locketd` to your system. Assuming that you installed Go correctly, they will be included in your `PATH`; otherwise, you may access them in `$GOPATH/bin`.
 
 ## Setting up PostgreSQL
 
