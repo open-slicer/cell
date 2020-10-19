@@ -6,8 +6,6 @@
 </div>
 
 ## what
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopen-slicer%2Fcell.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopen-slicer%2Fcell?ref=badge_shield)
-
 
 Cell implements the Slicer protocol in Go, consisting of two main components:
 
@@ -53,5 +51,5 @@ oh but also, IRC is old and insecure. Modern platforms are fast. The latter usua
 - [ ] Kubernetes
 
 
-## License
+## license
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopen-slicer%2Fcell.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopen-slicer%2Fcell?ref=badge_large)
