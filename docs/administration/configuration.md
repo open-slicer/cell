@@ -5,6 +5,7 @@ Cell looks for a config file in the working directory. It can be of JSON, TOML, 
 ## Examples
 
 ### cell.yml
+
 ```yaml
 environment: release # Enables verbose logging (debug or release)
 node: 0 # The ID of the node; only change this if you're scaling up
@@ -35,6 +36,7 @@ prometheus:
 ```
 
 ### locketd.yml
+
 ```yaml
 environment: release # Enables verbose logging (debug or release)
 port: 8000 # Port for locketd
