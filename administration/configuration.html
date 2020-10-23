@@ -169,7 +169,8 @@
                     <main>
                         <h1><a class="header" href="#configuration" id="configuration">Configuration</a></h1>
 <p>Cell looks for a config file in the working directory. It can be of JSON, TOML, YAML, HCL or Java properties format; the only requirement is that the file is called <code>cell.extension</code>, where extension can of course fit the format you’re using. If an extension isn’t provided, YAML will be used. This manual will use YAML.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2><a class="header" href="#examples" id="examples">Examples</a></h2>
+<h3><a class="header" href="#cellyml" id="cellyml">cell.yml</a></h3>
 <pre><code class="language-yaml">environment: release # Enables verbose logging (debug or release)
 node: 0 # The ID of the node; only change this if you're scaling up
 http:
@@ -193,9 +194,19 @@ security:
     cert_file: &quot;&quot; # The optional location of an SSL cert to use
     key_file: &quot;&quot; # The optional location of an SSL key to use
 locket:
-    token: extremely secure password # The password to use to secure the `/lockets` endpoint
+    token: extremely secure password # The password used to secure the `/lockets` endpoint
 prometheus:
-    token: extremely secure password # The password to use to secure the `/metrics` endpoint
+    token: extremely secure password # The password used to secure the `/metrics` endpoint
+</code></pre>
+<h3><a class="header" href="#locketdyml" id="locketdyml">locketd.yml</a></h3>
+<pre><code class="language-yaml">environment: release # Enables verbose logging (debug or release)
+port: 8000 # Port for locketd
+security:
+    secret: rh4NaXhju914cn60CHmuMREeQG1Qdh53o4sQ9iZWVlA= # A secure 32 byte key; try `openssl rand -base64 32`; needs to be the same as Cell's
+registration: # To register your locketd instance with Cell
+    home: http://localhost:8080 # Where to make a request to Cell at
+    token: extremely secure password # The token used to register with Cell
+    host: &quot;&quot; # Hostname of the locket (defaults to IP if not specified)
 </code></pre>
 
                     </main>
