@@ -41,7 +41,7 @@ prometheus:
 environment: release # Enables verbose logging (debug or release)
 port: 8000 # Port for locketd
 security:
-    rh4NaXhju914cn60CHmuMREeQG1Qdh53o4sQ9iZWVlA= # A secure 32 byte key; try `openssl rand -base64 32`
+    secret: rh4NaXhju914cn60CHmuMREeQG1Qdh53o4sQ9iZWVlA= # A secure 32 byte key; try `openssl rand -base64 32`; needs to be the same as Cell's
 registration: # To register your locketd instance with Cell
     home: http://localhost:8080 # Where to make a request to Cell at
     token: extremely secure password # The token used to register with Cell
