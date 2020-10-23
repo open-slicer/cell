@@ -29,9 +29,9 @@ security:
     cert_file: "" # The optional location of an SSL cert to use
     key_file: "" # The optional location of an SSL key to use
 locket:
-    token: extremely secure password # The password to used to secure the `/lockets` endpoint
+    token: extremely secure password # The password used to secure the `/lockets` endpoint
 prometheus:
-    token: extremely secure password # The password to used to secure the `/metrics` endpoint
+    token: extremely secure password # The password used to secure the `/metrics` endpoint
 ```
 
 ### locketd.yml
