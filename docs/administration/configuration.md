@@ -2,8 +2,9 @@
 
 Cell looks for a config file in the working directory. It can be of JSON, TOML, YAML, HCL or Java properties format; the only requirement is that the file is called `cell.extension`, where extension can of course fit the format you're using. If an extension isn't provided, YAML will be used. This manual will use YAML.
 
-## Example
+## Examples
 
+### cell.yml
 ```yaml
 environment: release # Enables verbose logging (debug or release)
 node: 0 # The ID of the node; only change this if you're scaling up
@@ -28,7 +29,19 @@ security:
     cert_file: "" # The optional location of an SSL cert to use
     key_file: "" # The optional location of an SSL key to use
 locket:
-    token: extremely secure password # The password to use to secure the `/lockets` endpoint
+    token: extremely secure password # The password to used to secure the `/lockets` endpoint
 prometheus:
-    token: extremely secure password # The password to use to secure the `/metrics` endpoint
+    token: extremely secure password # The password to used to secure the `/metrics` endpoint
+```
+
+### locketd.yml
+```yaml
+environment: release # Enables verbose logging (debug or release)
+port: 8000 # Port for locketd
+security:
+    rh4NaXhju914cn60CHmuMREeQG1Qdh53o4sQ9iZWVlA= # A secure 32 byte key; try `openssl rand -base64 32`
+registration: # To register your locketd instance with Cell
+    home: http://localhost:8080 # Where to make a request to Cell at
+    token: extremely secure password # The token used to register with Cell
+    host: "" # Hostname of the locket (defaults to IP if not specified)
 ```
