@@ -3,7 +3,7 @@
   <p>Cell is the reference implementation of the Slicer server.</p>
   <img src="https://goreportcard.com/badge/github.com/open-slicer/cell">
   <img src="https://github.com/open-slicer/cell/workflows/Go%20Build/badge.svg">
-  <a href="http://www.apache.org/licenses/LICENSE-2.0.html"><img src="https://owo.gg/alex/sourcebadges/-/raw/master/SVG/CC_Apache%202.0.svg" height="20"></a>
+  <a href="http://www.apache.org/licenses/LICENSE-2.0.html"><img alt="Apache 2.0" src="https://owo.gg/alex/sourcebadges/-/raw/master/SVG/CC_Apache%202.0.svg" height="20"></a>
 </div>
 
 ## what
@@ -53,4 +53,5 @@ oh but also, IRC is old and insecure. Modern platforms are fast. The latter usua
 
 
 ## license
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopen-slicer%2Fcell.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopen-slicer%2Fcell?ref=badge_large)
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.html"><img alt="Apache 2.0" src="https://owo.gg/alex/sourcebadges/-/raw/master/SVG/CC_Apache%202.0.svg" height="100"></a>
